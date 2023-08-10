@@ -1,0 +1,75 @@
+// SFProDisplay
+// @font-face {
+//   font-family: SFProDisplay;
+//   font-weight: 300;
+//   src: url("../fonts/SFProDisplay-Light.ttf");
+// }
+// @font-face {
+//   font-family: SFProDisplay;
+//   font-weight: 400;
+//   src: url("../fonts/SFProDisplay-Regular.ttf");
+// }
+// @font-face {
+//   font-family: SFProDisplay;
+//   font-weight: 500;
+//   src: url("../fonts/SFProDisplay-Medium.ttf");
+// }
+// @font-face {
+//   font-family: SFProDisplay;
+//   font-weight: 600;
+//   src: url("../fonts/SFProDisplay-Semibold.ttf");
+// }
+// @font-face {
+//   font-family: SFProDisplay;
+//   font-weight: 700;
+//   src: url("../fonts/SFProDisplay-Bold.ttf");
+// }
+
+// Graphik
+@font-face {
+  font-family: Graphik;
+  font-weight: 300;
+  src: url("../fonts/GraphikLight.otf");
+}
+@font-face {
+  font-family: Graphik;
+  font-weight: 400;
+  src: url("../fonts/GraphikRegular.otf");
+}
+@font-face {
+  font-family: Graphik;
+  font-weight: 500;
+  src: url("../fonts/GraphikMedium.otf");
+}
+@font-face {
+  font-family: Graphik;
+  font-weight: 600;
+  src: url("../fonts/GraphikSemibold.otf");
+}
+@font-face {
+  font-family: Graphik;
+  font-weight: 700;
+  src: url("../fonts/GraphikBold.otf");
+}
+
+//
+html body {
+  @apply font-body antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  @apply font-display;
+}
+
+:root {
+  --font-display: Graphik;
+  --font-body: Graphik;
+}
+
+.theme-animals {
+  --font-display: Graphik;
+  --font-body: Graphik;
+}
