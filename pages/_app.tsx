@@ -4,13 +4,18 @@ import type { AppProps } from "next/app";
 import "@rainbow-me/rainbowkit/styles.css";
 import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { configureChains, createConfig, WagmiConfig } from "wagmi";
-import { optimism, optimismGoerli, zora } from "wagmi/chains";
+import { optimism, optimismGoerli, zora, goerli } from "wagmi/chains";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
 
 const { chains, publicClient } = configureChains(
-  [optimism, optimismGoerli, zora],
-  [alchemyProvider({ apiKey: process.env.ALCHEMY_ID || "" }), publicProvider()]
+  [optimism, optimismGoerli, zora, goerli],
+  [
+    alchemyProvider({
+      apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY,
+    } as any),
+    publicProvider(),
+  ]
 );
 const { connectors } = getDefaultWallets({
   appName: "Atestamint",
@@ -26,9 +31,8 @@ const wagmiConfig = createConfig({
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <WagmiConfig config={wagmiConfig}>
-      <RainbowKitProvider chains={chains}>
-        {" "}
-        <Component {...pageProps} />{" "}
+      <RainbowKitProvider coolMode chains={chains}>
+        <Component {...pageProps} />
       </RainbowKitProvider>
     </WagmiConfig>
   );

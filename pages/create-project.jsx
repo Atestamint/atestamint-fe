@@ -1,8 +1,19 @@
+import React, { useState } from "react";
 import Layout from "@/components/layout";
 import Image from "next/image";
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
+import { FilePond, registerPlugin } from "react-filepond";
+import "filepond/dist/filepond.min.css";
+import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
+import FilePondPluginImagePreview from "filepond-plugin-image-preview";
+import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
+
+// Register the plugins
+registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview);
 
 export default function CreateProject() {
+  const [files, setFiles] = useState([]);
+
   return (
     <Layout>
       <div className="md:flex md:items-center md:justify-between">
@@ -195,7 +206,7 @@ export default function CreateProject() {
       {/* Step 1 Panel End */}
 
       {/* Step 2 Panel Start */}
-      <div className="mt-5 bg-white shadow sm:rounded-2xl overflow-hidden">
+      {/* <div className="mt-5 bg-white shadow sm:rounded-2xl overflow-hidden">
         <div className="px-5 py-3 text-white font-semibold text-xl bg-indigo-600">
           2. Create Your NFT Collection
         </div>
@@ -278,8 +289,278 @@ export default function CreateProject() {
             </button>
           </div>
         </div>
-      </div>
+      </div> */}
       {/* Step 2 Panel End */}
+
+      {/* New Step 2 Panel Start */}
+      <div className="mt-5 bg-white shadow sm:rounded-2xl overflow-hidden">
+        <div className="px-5 py-3 text-white font-semibold text-xl bg-indigo-600">
+          2. Create Your NFT Collection
+        </div>
+        <div className="px-4 py-5 sm:p-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-5 lg:gap-y-0 lg:gap-x-5">
+            {/* Image upload column */}
+            <div>
+              <FilePond
+                files={files}
+                onupdatefiles={setFiles}
+                allowMultiple={true}
+                maxFiles={1}
+                server="/api"
+                name="files" /* sets the file input name, it's filepond by default */
+                labelIdle='Drag & Drop your files or <span class="filepond--label-action">Browse</span>'
+              />
+            </div>
+            {/* NFT Details Column */}
+            <div>
+              <div>
+                <label
+                  htmlFor="nftName"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Name
+                </label>
+                <div className="mt-2">
+                  <input
+                    type="text"
+                    name="nftName"
+                    id="nftName"
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    placeholder="Colossal Shitcake"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-5">
+                <label
+                  htmlFor="symbol"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Symbol
+                </label>
+                <div className="mt-2">
+                  <input
+                    type="text"
+                    name="symbol"
+                    id="symbol"
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    placeholder="CS"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-5">
+                <label
+                  htmlFor="editionSize"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Edition Size
+                </label>
+                <div className="mt-2">
+                  <input
+                    type="text"
+                    name="editionSize"
+                    id="editionSize"
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    placeholder="24"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-5">
+                <label
+                  htmlFor="royaltyBPS"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Royalty BPS
+                </label>
+                <div className="mt-2">
+                  <input
+                    type="text"
+                    name="royaltyBPS"
+                    id="royaltyBPS"
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    placeholder="UGDF"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-5">
+                <label
+                  htmlFor="royaltyBPS"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Address Payable Funds Recipient
+                </label>
+                <div className="mt-2">
+                  <input
+                    type="text"
+                    name="royaltyBPS"
+                    id="royaltyBPS"
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    placeholder="UGDF"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-5">
+                <label
+                  htmlFor="royaltyBPS"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Address Default Admin
+                </label>
+                <div className="mt-2">
+                  <input
+                    type="text"
+                    name="royaltyBPS"
+                    id="royaltyBPS"
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    placeholder="UGDF"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-5">
+                <label
+                  htmlFor="royaltyBPS"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Description
+                </label>
+                <div className="mt-2">
+                  <textarea
+                    rows={4}
+                    name="comment"
+                    id="comment"
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    defaultValue={""}
+                    placeholder="Our organization will plant 100 evergreen trees in Nanaimo, British Columbia to help improve soil and water conservation, store carbon, moderate local climate, and give life to the world's wildlife."
+                  />
+                </div>
+              </div>
+
+              <div className="mt-5">
+                <label
+                  htmlFor="royaltyBPS"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Animation URI
+                </label>
+                <div className="mt-2">
+                  <input
+                    type="text"
+                    name="royaltyBPS"
+                    id="royaltyBPS"
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    placeholder="UGDF"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-5">
+                <label
+                  htmlFor="royaltyBPS"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Image URI
+                </label>
+                <div className="mt-2">
+                  <input
+                    type="text"
+                    name="royaltyBPS"
+                    id="royaltyBPS"
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    placeholder="UGDF"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-5">
+                <label
+                  htmlFor="royaltyBPS"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Animation URI
+                </label>
+                <div className="mt-2">
+                  <input
+                    type="text"
+                    name="royaltyBPS"
+                    id="royaltyBPS"
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    placeholder="UGDF"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-5">
+                <label
+                  htmlFor="royaltyBPS"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Mint Start
+                </label>
+                <div className="mt-2">
+                  <input
+                    type="date"
+                    name="royaltyBPS"
+                    id="royaltyBPS"
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    placeholder="UGDF"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-5">
+                <label
+                  htmlFor="royaltyBPS"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Mint Duration
+                </label>
+                <div className="mt-2">
+                  <input
+                    type="number"
+                    name="royaltyBPS"
+                    id="royaltyBPS"
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    placeholder="UGDF"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-5">
+                <label
+                  htmlFor="royaltyBPS"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Mint Limit per Address
+                </label>
+                <div className="mt-2">
+                  <input
+                    type="text"
+                    name="royaltyBPS"
+                    id="royaltyBPS"
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    placeholder="UGDF"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-5 flex justify-end gap-x-3">
+            <button
+              type="button"
+              className="rounded-full bg-white px-4 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+            >
+              Next Step
+            </button>
+          </div>
+        </div>
+      </div>
+      {/* New Step 2 Panel End */}
     </Layout>
   );
 }
