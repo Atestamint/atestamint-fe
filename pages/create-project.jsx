@@ -34,71 +34,110 @@ export default function CreateProject() {
     milestoneAttestationThreshold: "50",
     milestoneDescription: "",
   });
-  const [milestoneURI, setMilestoneURI] = useState("");
   const [milestoneSaving, setMilestoneSaving] = useState(false);
   const [createEditionParams, setCreateEditionParams] = useState({
     name: "",
     symbol: "",
     editionSize: 0,
     royaltyBPS: 0,
-    saleConfig: {
-      publicSalePrice: 0,
-      maxSalePurchasePerAddress: 0,
-      publicSaleStart: 0,
-      publicSaleEnd: 0,
-      presaleStart: 0,
-      presaleEnd: 0,
-      presaleMerkleRoot: "",
-    },
+    publicSalePrice: 0.00001,
+    maxSalePurchasePerAddress: 0,
+    publicSaleStart: 0,
+    publicSaleEnd: 0,
+    presaleStart: 0,
+    presaleEnd: 0,
+    presaleMerkleRoot: "",
     description: "",
     animationURI: "",
-    imageURI: "",
     metadataContractURI: "",
   });
   const [files, setFiles] = useState([]);
 
-  const debouncedCreateEditionParams = useDebounce(createEditionParams, 500);
-
   const {
-    config,
+    data,
     error: prepareError,
     isError: isPrepareError,
-  } = usePrepareContractWrite({
+    isLoading,
+    isSuccess,
+    write,
+  } = useContractWrite({
     address: ATESTAMINT_CONTRACT_ADDRESS,
     abi: ATESTAMINT_ABI,
-    functionName: "mint",
-    args: [parseInt(debouncedCreateEditionParams)],
-    enabled: Boolean(debouncedCreateEditionParams),
-  });
-  const { data, error, isError, write } = useContractWrite(config);
-  const { isLoading, isSuccess } = useWaitForTransaction({
-    hash: data?.hash,
+    functionName: "createEditionCollection",
   });
 
-  // async function storeMetadata(metadata) {
-  //   const metadata = await client.store(metadata);
-  // }
+  const handleImageUpload = (files) => {
+    setFiles(files);
+
+    console.log("Files: ", files);
+
+    const file = files[0].file;
+
+    storage_client
+      .storeBlob(file)
+      .then((cid) => {
+        console.log("NFT Storage Response:", cid);
+        setCreateEditionParams({
+          ...createEditionParams,
+          imageURI: `https://ipfs.io/ipfs/${cid}`,
+        });
+      })
+      .catch((err) => {
+        console.log("Error from NftStorage:", err);
+      });
+  };
   const handleWorldCoinSuccess = (data) => {
     console.log("WorldCoin Success:", data);
     setWorldCoinData(data);
   };
 
-  const handleVerify = (data) => {
-    console.log("WorldCoin Verify:", data);
-  };
-
   const handleMilestoneData = (e) => {
     setMilestoneSaving(true);
     storage_client
-      .store(milestoneData)
-      .then((res) => {
-        console.log("NFT Storage Response:", res);
-        setMilestoneURI(res.url);
+      .storeBlob(new Blob([JSON.stringify(milestoneData)]))
+      .then((cid) => {
+        console.log("NFT Storage Response:", cid);
+        setCreateEditionParams({
+          ...createEditionParams,
+          metadataContractURI: `https://ipfs.io/ipfs/${cid}`,
+        });
         setMilestoneSaving(false);
       })
       .catch((err) => {
         console.log("Error from NftStorage:", err);
+        setMilestoneSaving(false);
       });
+  };
+
+  const handleCreateEdition = () => {
+    console.log("Unformatted: ", createEditionParams);
+
+    let args = [
+      createEditionParams.name,
+      createEditionParams.symbol,
+      parseInt(createEditionParams.editionSize),
+      parseInt(createEditionParams.royaltyBPS),
+      [
+        parseInt(createEditionParams.publicSalePrice),
+        parseInt(createEditionParams.maxSalePurchasePerAddress),
+        parseInt(createEditionParams.publicSaleStart),
+        parseInt(createEditionParams.publicSaleEnd),
+        parseInt(createEditionParams.presaleStart),
+        parseInt(createEditionParams.presaleEnd),
+        createEditionParams.presaleMerkleRoot,
+      ],
+      createEditionParams.description,
+      createEditionParams.animationURI,
+      createEditionParams.imageURI,
+      createEditionParams.metadataContractURI,
+    ];
+    console.log("Formatted: ", args);
+
+    // write({
+    //   args,
+    //   from: address,
+    //   // value: parseEther("0.01"),
+    // });
   };
 
   useEffect(() => {
@@ -141,7 +180,7 @@ export default function CreateProject() {
               action="atestamint" // this is your action name from the Developer Portal
               signal={address}
               onSuccess={handleWorldCoinSuccess} // callback when the modal is closed
-              handleVerify={handleVerify} // optional callback when the proof is received
+              // handleVerify={handleVerify} // optional callback when the proof is received
               credential_types={["orb", "phone"]} // optional, defaults to ['orb']
               enableTelemetry // optional, defaults to false
             >
@@ -232,7 +271,7 @@ export default function CreateProject() {
                 Attestation Deadline <sup className="font-bold">*</sup>
               </label>
               <input
-                type="text"
+                type="date"
                 name="job-title"
                 id="job-title"
                 onChange={(e) =>
@@ -313,7 +352,7 @@ export default function CreateProject() {
             </div>
           </div>
           <label className="font-medium text-sm text-gray-600">
-            Milestone URI: {milestoneURI}
+            Milestone URI: {createEditionParams.metadataContractURI}
           </label>
 
           <div className="mt-5 flex justify-end gap-x-3">
@@ -329,7 +368,14 @@ export default function CreateProject() {
               Proceed
             </button>
             <button
-              type="button"
+              onClick={() => {
+                // Scroll page by 50%
+                window.scrollBy({
+                  top: window.innerHeight - 50,
+                  left: 0,
+                  behavior: "smooth",
+                });
+              }}
               className="rounded-full bg-white px-4 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
             >
               Next Step
@@ -339,93 +385,6 @@ export default function CreateProject() {
         {/* Form End */}
       </div>
       {/* Step 1 Panel End */}
-
-      {/* Step 2 Panel Start */}
-      {/* <div className="mt-5 bg-white shadow sm:rounded-2xl overflow-hidden">
-        <div className="px-5 py-3 text-white font-semibold text-xl bg-indigo-600">
-          2. Create Your NFT Collection
-        </div>
-        <div className="px-4 py-5 sm:p-6">
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium leading-6 text-gray-900"
-            >
-              1. Go to your preferred NFT Collection Creator.
-            </label>
-            <div className="mt-3 flex items-center gap-x-3">
-              <Image
-                src="/zora.png"
-                height={50}
-                width={220}
-                className="h-8 w-auto"
-                alt="ZORA"
-              />
-              <Image
-                src="/third-web.png"
-                height={50}
-                width={313}
-                className="h-8 w-auto"
-                alt="Third Web"
-              />
-            </div>
-          </div>
-          <div className="mt-8">
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium leading-6 text-gray-900"
-            >
-              2. Copy and paste your safe address into your “Payout Address”
-            </label>
-            <div className="mt-2">
-              <input
-                type="email"
-                name="email"
-                id="email"
-                defaultValue="Your Safe Address:   0xbbDd1b3C87c211E482CdA98eA14fa8bF50022CA0"
-                disabled
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500 disabled:ring-gray-200 sm:text-sm sm:leading-6"
-                placeholder="Your Safe Address: 0xbbDd1b3C87c211E482CdA98eA14fa8bF50022CA0"
-              />
-            </div>
-          </div>
-
-          <div className="mt-8">
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium leading-6 text-gray-900"
-            >
-              3. Sync Metadata
-            </label>
-            <div className="mt-2">
-              <input
-                type="email"
-                name="email"
-                id="email"
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                placeholder="Your NFT Contract Address"
-              />
-            </div>
-
-            <button
-              type="button"
-              className="mt-3 rounded-full bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            >
-              Sync
-            </button>
-          </div>
-
-          <div className="mt-5 flex justify-end gap-x-3">
-            <button
-              type="button"
-              className="rounded-full bg-white px-4 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-            >
-              Next Step
-            </button>
-          </div>
-        </div>
-      </div> */}
-      {/* Step 2 Panel End */}
 
       {/* New Step 2 Panel Start */}
       <div className="mt-5 bg-white shadow sm:rounded-2xl overflow-hidden">
@@ -439,9 +398,20 @@ export default function CreateProject() {
               <FilePond
                 files={files}
                 onupdatefiles={setFiles}
-                allowMultiple={true}
+                onaddfile={(file) => {
+                  console.log(file);
+                  storage_client
+                    .storeBlob(new Blob([JSON.stringify(file)]))
+                    .then((cid) => {
+                      setCreateEditionParams({
+                        ...createEditionParams,
+                        imageURI: `https://ipfs.io/ipfs/${cid}`,
+                      });
+                    });
+                }}
+                allowMultiple={false}
                 maxFiles={1}
-                server="/api"
+                // server="/api"
                 name="files" /* sets the file input name, it's filepond by default */
                 labelIdle='Drag & Drop your files or <span class="filepond--label-action">Browse</span>'
               />
@@ -457,6 +427,12 @@ export default function CreateProject() {
                 </label>
                 <div className="mt-2">
                   <input
+                    onChange={(e) => {
+                      setCreateEditionParams({
+                        ...createEditionParams,
+                        name: e.target.value,
+                      });
+                    }}
                     type="text"
                     name="nftName"
                     id="nftName"
@@ -475,6 +451,12 @@ export default function CreateProject() {
                 </label>
                 <div className="mt-2">
                   <input
+                    onChange={(e) => {
+                      setCreateEditionParams({
+                        ...createEditionParams,
+                        symbol: e.target.value,
+                      });
+                    }}
                     type="text"
                     name="symbol"
                     id="symbol"
@@ -493,6 +475,12 @@ export default function CreateProject() {
                 </label>
                 <div className="mt-2">
                   <input
+                    onChange={(e) => {
+                      setCreateEditionParams({
+                        ...createEditionParams,
+                        editionSize: e.target.value,
+                      });
+                    }}
                     type="text"
                     name="editionSize"
                     id="editionSize"
@@ -511,42 +499,12 @@ export default function CreateProject() {
                 </label>
                 <div className="mt-2">
                   <input
-                    type="text"
-                    name="royaltyBPS"
-                    id="royaltyBPS"
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    placeholder="UGDF"
-                  />
-                </div>
-              </div>
-
-              <div className="mt-5">
-                <label
-                  htmlFor="royaltyBPS"
-                  className="block text-sm font-medium leading-6 text-gray-900"
-                >
-                  Address Payable Funds Recipient
-                </label>
-                <div className="mt-2">
-                  <input
-                    type="text"
-                    name="royaltyBPS"
-                    id="royaltyBPS"
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    placeholder="UGDF"
-                  />
-                </div>
-              </div>
-
-              <div className="mt-5">
-                <label
-                  htmlFor="royaltyBPS"
-                  className="block text-sm font-medium leading-6 text-gray-900"
-                >
-                  Address Default Admin
-                </label>
-                <div className="mt-2">
-                  <input
+                    onChange={(e) => {
+                      setCreateEditionParams({
+                        ...createEditionParams,
+                        royaltyBPS: e.target.value,
+                      });
+                    }}
                     type="text"
                     name="royaltyBPS"
                     id="royaltyBPS"
@@ -565,6 +523,12 @@ export default function CreateProject() {
                 </label>
                 <div className="mt-2">
                   <textarea
+                    onChange={(e) => {
+                      setCreateEditionParams({
+                        ...createEditionParams,
+                        description: e.target.value,
+                      });
+                    }}
                     rows={4}
                     name="comment"
                     id="comment"
@@ -574,7 +538,6 @@ export default function CreateProject() {
                   />
                 </div>
               </div>
-
               <div className="mt-5">
                 <label
                   htmlFor="royaltyBPS"
@@ -584,15 +547,15 @@ export default function CreateProject() {
                 </label>
                 <div className="mt-2">
                   <input
+                    disabled={true}
                     type="text"
                     name="royaltyBPS"
                     id="royaltyBPS"
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    placeholder="UGDF"
+                    value={createEditionParams.imageURI}
                   />
                 </div>
               </div>
-
               <div className="mt-5">
                 <label
                   htmlFor="royaltyBPS"
@@ -602,6 +565,12 @@ export default function CreateProject() {
                 </label>
                 <div className="mt-2">
                   <input
+                    onChange={(e) => {
+                      setCreateEditionParams({
+                        ...createEditionParams,
+                        animationURI: e.target.value,
+                      });
+                    }}
                     type="text"
                     name="royaltyBPS"
                     id="royaltyBPS"
@@ -620,29 +589,36 @@ export default function CreateProject() {
                 </label>
                 <div className="mt-2">
                   <input
+                    onChange={(e) => {
+                      setCreateEditionParams({
+                        ...createEditionParams,
+                        publicSaleStart: e.target.value,
+                      });
+                    }}
                     type="date"
-                    name="royaltyBPS"
-                    id="royaltyBPS"
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    placeholder="UGDF"
+                    value={Date().now}
                   />
                 </div>
               </div>
 
               <div className="mt-5">
-                <label
-                  htmlFor="royaltyBPS"
-                  className="block text-sm font-medium leading-6 text-gray-900"
-                >
+                <label className="block text-sm font-medium leading-6 text-gray-900">
                   Mint Duration
                 </label>
                 <div className="mt-2">
                   <input
+                    onChange={(e) => {
+                      setCreateEditionParams({
+                        ...createEditionParams,
+                        publicSaleEnd:
+                          createEditionParams.saleConfig.presaleStart +
+                          e.target.value,
+                      });
+                    }}
                     type="number"
-                    name="royaltyBPS"
-                    id="royaltyBPS"
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    placeholder="UGDF"
+                    placeholder="In days"
                   />
                 </div>
               </div>
@@ -656,11 +632,15 @@ export default function CreateProject() {
                 </label>
                 <div className="mt-2">
                   <input
-                    type="text"
-                    name="royaltyBPS"
-                    id="royaltyBPS"
+                    onChange={(e) => {
+                      setCreateEditionParams({
+                        ...createEditionParams,
+                        maxSalePurchasePerAddress: e.target.value,
+                      });
+                    }}
+                    type="number"
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    placeholder="UGDF"
+                    placeholder="0 for unlimited *"
                   />
                 </div>
               </div>
@@ -669,7 +649,7 @@ export default function CreateProject() {
 
           <div className="mt-5 flex justify-end gap-x-3">
             <button
-              type="button"
+              onClick={() => handleCreateEdition}
               className="rounded-full bg-white px-4 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
             >
               Finish
