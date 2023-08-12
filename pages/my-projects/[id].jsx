@@ -9,11 +9,11 @@ export default function Landing() {
       <div className="mt-5 px-4 py-5 sm:p-6 sm:py-12 grid grid-cols-1 lg:grid-cols-2 lg:gap-x-12 gap-y-5 lg:gap-y-0 bg-white shadow sm:rounded-2xl overflow-hidden">
         <div>
           <Image
-            src="/hero.jpg"
-            height={1280}
+            src="/nftree.jpg"
+            height={1000}
             width={1920}
             alt="Collection Image"
-            className="w-full h-auto"
+            className="w-full h-auto rounded-2xl"
           />
 
           <div className="mt-8">
@@ -21,17 +21,17 @@ export default function Landing() {
               htmlFor="email"
               className="block text-sm font-medium leading-6 text-gray-900"
             >
-              Your Safe Address
+              Your Vault Address
             </label>
             <div className="mt-2">
               <input
                 type="email"
                 name="email"
                 id="email"
-                defaultValue="kutfvjutbkuyfkyufcjt64evuyt"
+                defaultValue=""
                 disabled
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500 disabled:ring-gray-200 sm:text-sm sm:leading-6"
-                placeholder="kutfvjutbkuyfkyufcjt64evuyt"
+                placeholder="0xFdEdFc08cfa325fC2479dAf28Ae7e3A326EEC20C"
               />
             </div>
           </div>
@@ -47,10 +47,10 @@ export default function Landing() {
                 type="email"
                 name="email"
                 id="email"
-                defaultValue="kutfvjutbkuyfkyufcjt64evuyt"
+                defaultValue=""
                 disabled
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500 disabled:ring-gray-200 sm:text-sm sm:leading-6"
-                placeholder="you@example.com"
+                placeholder="0xFdEdFc08cfa325fC2479dAf28Ae7e3A326EEC20C"
               />
             </div>
           </div>
@@ -83,7 +83,7 @@ export default function Landing() {
                 type="button"
                 className="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
               >
-                ERC 721
+                ERC 1155
               </button>
             </div>
           </div>

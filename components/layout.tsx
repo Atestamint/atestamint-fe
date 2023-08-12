@@ -21,8 +21,18 @@ const navigation = [
     icon: UsersIcon,
     current: false,
   },
-  { name: "Creator Dashboard", href: "#", icon: FolderIcon, current: false },
-  { name: "Atestamint Score", href: "#", icon: CalendarIcon, current: false },
+  {
+    name: "Creator Dashboard",
+    href: "my-projects/1",
+    icon: FolderIcon,
+    current: false,
+  },
+  {
+    name: "Atestamint Score",
+    href: "/attestamint-score",
+    icon: CalendarIcon,
+    current: false,
+  },
 ];
 
 function classNames(...classes: string[]) {
@@ -199,7 +209,7 @@ export default function Layout({ children }: Props) {
                       alt=""
                     />
                     <span className="sr-only">Your profile</span>
-                    <span aria-hidden="true">Tom Cook</span>
+                    <span aria-hidden="true">Richard Hendricks</span>
                   </a>
                 </li>
               </ul>
