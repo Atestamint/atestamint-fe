@@ -2,33 +2,37 @@ const { request, gql } = require("graphql-request");
 
 async function getCollectionQuery(collectionAddress) {
   const endpoint =
-    "https://api.studio.thegraph.com/query/51108/atestamint-testing/v0.0.7";
+    "https://api.studio.thegraph.com/query/51108/atestamint-testing/v1.0.0";
   const query = gql`
-    query CollectionDetails($id: ID!) {
-      dropCollection(id: $id) {
+    query Projects {
+      editionCollections {
         creator
         currentTokenId
-        dropAddress
         editionSize
         metadataContractURI
-        vaultAddress
-      }
-      editionCollection(id: $id) {
-        creator
-        currentTokenId
-        editionAddress
-        editionSize
-        metadataContractURI
-        vaultAddress
+        id
+        imageURI
+        vault {
+          positiveVotes
+          nftAddress
+          isUnlocked
+          id
+          editionSize
+        }
       }
     }
   `;
 
   try {
-    const data = await request(endpoint, query, { id: collectionAddress });
-    console.log("Data:", data);
-    if (data.dropCollection) return data.dropCollection;
-    else return data.editionCollection;
+    const data = await request(endpoint, query);
+
+    console.log("Data:", data.editionCollections);
+    console.log("Collection Address:", collectionAddress);
+
+    const collection = data.editionCollections.find(
+      (collection) => collection.id === collectionAddress
+    );
+    return collection;
   } catch (error) {
     console.error("Error fetching data:", error);
     return [];

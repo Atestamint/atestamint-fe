@@ -163,31 +163,35 @@ export default function CreateProject() {
         <div className="px-5 py-3 text-white font-semibold text-xl bg-indigo-600">
           1. Add Your Milestones
         </div>
-        <div className="px-4 py-5 sm:p-6">
-          <h3 className="text-base font-semibold leading-6 text-gray-900">
-            First, prove you&apos;re a real person.
-          </h3>
-          <div className="mt-5">
-            <IDKitWidget
-              app_id="app_staging_8ba6b6491a27ba84a2255bcde4bcd3f3" // obtained from the Developer Portal
-              action="atestamint" // this is your action name from the Developer Portal
-              signal={address}
-              onSuccess={handleWorldCoinSuccess} // callback when the modal is closed
-              // handleVerify={handleVerify} // optional callback when the proof is received
-              credential_types={["orb", "phone"]} // optional, defaults to ['orb']
-              enableTelemetry // optional, defaults to false
-            >
-              {({ open }) => (
-                <button
-                  className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                  onClick={open}
-                >
-                  Verify with World ID
-                </button>
-              )}
-            </IDKitWidget>
+        {worldCoinData?.proof ? (
+          <div className={"px-4 py-5 sm:p-6"}>You are worldcoin verified!</div>
+        ) : (
+          <div className="px-4 py-5 sm:p-6">
+            <h3 className="text-base font-semibold leading-6 text-gray-900">
+              Prove you&apos;re a real person.
+            </h3>
+            <div className="mt-5">
+              <IDKitWidget
+                app_id="app_staging_8ba6b6491a27ba84a2255bcde4bcd3f3" // obtained from the Developer Portal
+                action="atestamint" // this is your action name from the Developer Portal
+                signal={address}
+                onSuccess={handleWorldCoinSuccess} // callback when the modal is closed
+                // handleVerify={handleVerify} // optional callback when the proof is received
+                credential_types={["orb", "phone"]} // optional, defaults to ['orb']
+                enableTelemetry // optional, defaults to false
+              >
+                {({ open }) => (
+                  <button
+                    className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                    onClick={open}
+                  >
+                    Verify with World ID
+                  </button>
+                )}
+              </IDKitWidget>
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="px-4 py-5 sm:p-6">
           <div>

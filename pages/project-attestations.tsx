@@ -225,7 +225,10 @@ export default function ProjectAttestations() {
                 <tr key={collectionIdx}>
                   <td className="border-t border-gray-200 px-3 py-3.5 text-smtext-gray-500">
                     <div className="font-medium text-gray-900">
-                      <a href="#" className="group block flex-shrink-0">
+                      <a
+                        href={`collections/${collection.editionAddress}`}
+                        className="group block flex-shrink-0"
+                      >
                         <div className="flex items-center">
                           <div>
                             <Image
@@ -317,7 +320,10 @@ export default function ProjectAttestations() {
                 <tr key={collectionIdx}>
                   <td className="border-t border-gray-200 px-3 py-3.5 text-smtext-gray-500">
                     <div className="font-medium text-gray-900">
-                      <a href="#" className="group block flex-shrink-0">
+                      <a
+                        href={`collections/${collection.id}`}
+                        className="group block flex-shrink-0"
+                      >
                         <div className="flex items-center">
                           <div>
                             <Image
@@ -330,10 +336,10 @@ export default function ProjectAttestations() {
                           </div>
                           <div className="ml-3">
                             <p className="text-sm font-medium text-gray-700 group-hover:text-gray-900">
-                              Richard Hendricks
+                              {collection.id.slice(0, 10)}
                             </p>
                             <p className="text-xs font-medium text-gray-500 group-hover:text-gray-700">
-                              {collection.id.slice(0, 10)}
+                              View more details
                             </p>
                           </div>
                         </div>
