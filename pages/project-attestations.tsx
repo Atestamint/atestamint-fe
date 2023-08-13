@@ -163,13 +163,16 @@ function AttestCollection({
           >
             <div className="flex items-center">
               <div>
-                <Image
-                  className="inline-block h-9 w-9 rounded-full"
-                  src="/nftree.jpg"
-                  height={64}
-                  width={64}
-                  alt=""
-                />
+                <picture>
+                  <source srcSet={collection.imageURI} type="image/*" />
+                  <img
+                    className="inline-block h-9 w-9 rounded-full"
+                    loading="lazy"
+                    src={collection.imageURI}
+                    // fallback
+                    alt="image"
+                  />
+                </picture>
               </div>
               <div className="ml-3">
                 <p className="text-sm font-medium text-gray-700 group-hover:text-gray-900">
@@ -247,13 +250,16 @@ function AttestCollectionClone({
           >
             <div className="flex items-center">
               <div>
-                <Image
-                  className="inline-block h-9 w-9 rounded-full"
-                  src="/nftree.jpg"
-                  height={64}
-                  width={64}
-                  alt=""
-                />
+                <picture>
+                  <source srcSet={collection.imageURI} type="image/*" />
+                  <img
+                    className="inline-block h-9 w-9 rounded-full"
+                    loading="lazy"
+                    src={collection.imageURI}
+                    // fallback
+                    alt="image"
+                  />
+                </picture>
               </div>
               <div className="ml-3">
                 <p className="text-sm font-medium text-gray-700 group-hover:text-gray-900">

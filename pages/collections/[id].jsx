@@ -123,13 +123,18 @@ export default function Landing() {
       {!loading ? (
         <div className="mt-5 px-4 py-5 sm:p-6 sm:py-12 grid grid-cols-1 lg:grid-cols-2 lg:gap-x-12 gap-y-5 lg:gap-y-0 bg-white shadow sm:rounded-2xl overflow-hidden">
           <div>
-            <Image
-              src="/nftree.jpg"
-              height={1000}
-              width={1920}
-              alt="Collection Image"
-              className="w-full h-auto rounded-2xl"
-            />
+            <div>
+              <picture>
+                <source srcSet={collection.imageURI} type="image/*" />
+                <img
+                  className="w-full h-auto rounded-2xl"
+                  loading="lazy"
+                  src={collection.imageURI}
+                  // fallback
+                  alt="image"
+                />
+              </picture>
+            </div>
 
             <div className="mt-8">
               <label
@@ -140,9 +145,7 @@ export default function Landing() {
               </label>
               <div className="mt-2">
                 <input
-                  type="email"
-                  name="email"
-                  id="email"
+                  type="text"
                   defaultValue=""
                   disabled
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500 disabled:ring-gray-200 sm:text-sm sm:leading-6"
@@ -180,13 +183,16 @@ export default function Landing() {
             <div className="mt-5 flex items-center justify-between">
               <div>
                 <div className="flex items-center gap-x-3">
-                  <Image
-                    src={"/nftree.jpg"}
-                    height={1280}
-                    width={1920}
-                    alt="Collection Image"
-                    className="w-12 h-auto"
-                  />
+                  <picture>
+                    <source srcSet={collection.imageURI} type="image/*" />
+                    <img
+                      className="w-12 h-auto"
+                      loading="lazy"
+                      src={collection.imageURI}
+                      // fallback
+                      alt="image"
+                    />
+                  </picture>
                   <Link href="#" passHref={true}>
                     NFTrees
                   </Link>

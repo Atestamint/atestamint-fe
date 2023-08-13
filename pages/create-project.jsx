@@ -49,6 +49,7 @@ export default function CreateProject() {
     presaleMerkleRoot:
       "0x0000000000000000000000000000000000000000000000000000000000000000",
     description: "",
+    imageURI: "",
     animationURI:
       "https://ipfs.io/ipfs/bafkreieb5wgfpxshncubgm232x4duop7cwwi7wr23rmsdxbq2mcjbczmti",
     metadataContractURI: "",
@@ -673,8 +674,9 @@ export default function CreateProject() {
 
           <div className="mt-5 flex justify-end gap-x-3">
             <button
+              disabled={createEditionParams.imageURI === ""}
               onClick={handleCreateEdition}
-              className="rounded-full bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-gray-200 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 hover:text-black"
+              className="disabled:opacity-50 rounded-full bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-gray-200 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 hover:text-black"
             >
               Finish
             </button>
