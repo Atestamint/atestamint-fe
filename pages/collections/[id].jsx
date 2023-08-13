@@ -5,6 +5,7 @@ import getCollection from "../../utils/thegraph-queries/getCollection";
 import { Fragment, useState, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { useRouter } from "next/router";
+import { VAULT_CONTRACT_ABI } from "../../utils/constants";
 
 import {
   ExclamationTriangleIcon,
@@ -88,6 +89,11 @@ export default function Landing() {
   const [collection, setCollection] = useState(null);
   const [milestoneData, setMilestoneData] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const { write: unlockFunds } = useContractWrite({
+    abi: VAULT_CONTRACT_ABI,
+    functionName: "unlockFunds",
+  });
 
   useEffect(() => {
     (async () => {
@@ -267,6 +273,11 @@ export default function Landing() {
             <div className="mt-8">
               <button
                 type="button"
+                onClick={() => {
+                  unlockFunds({
+                    to: collection.vault.id,
+                  });
+                }}
                 className="flex items-center rounded-md bg-slate-900 px-5 py-3 text-sm font-semibold text-gray-100 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 hover:text-black"
               >
                 Claim Funds

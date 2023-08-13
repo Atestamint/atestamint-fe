@@ -12,14 +12,20 @@ import {
   ATESTAMINT_CONTRACT_ADDRESS,
   ATESTAMINT_ABI,
   ERC721DROP_ABI,
+  VAULT_CONTRACT_ABI,
 } from "../utils/constants";
+import { NFTStorage, File, Blob } from "nft.storage";
 
 import { Dialog, Transition } from "@headlessui/react";
 import {
   ExclamationTriangleIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { all } from "axios";
+function convertProofToUINT(proof: any) {
+  const unpackedProof = decodeAbiParameters([{ type: "uint256[8]" }], proof)[0];
+  console.log("Unpacked Proof:", unpackedProof);
+  return unpackedProof;
+}
 
 const collections = [
   {
@@ -57,15 +63,154 @@ const collections = [
   },
 ];
 
+const storage_client = new NFTStorage({
+  token: process.env.NEXT_PUBLIC_NFT_STORAGE_KEY || "",
+});
+
+function PublicCollection({ collection, collectionIdx, worldCoinData }: any) {
+  const { write: mint } = useContractWrite({
+    address: collection.id,
+    abi: ERC721DROP_ABI,
+    functionName: "purchase",
+    args: [1],
+    value: parseEther("0.000877"),
+  });
+
+  return (
+    <tr key={collectionIdx}>
+      <td className="border-t border-gray-200 px-3 py-3.5 text-smtext-gray-500">
+        <div className="font-medium text-gray-900">
+          <a
+            href={`collections/${collection.id}`}
+            className="group block flex-shrink-0"
+          >
+            <div className="flex items-center">
+              <div>
+                <Image
+                  className="inline-block h-9 w-9 rounded-full"
+                  src="/nftree.jpg"
+                  height={64}
+                  width={64}
+                  alt=""
+                />
+              </div>
+              <div className="ml-3">
+                <p className="text-sm font-medium text-gray-700 group-hover:text-gray-900">
+                  {collection.id.slice(0, 10)}
+                </p>
+                <p className="text-xs font-medium text-gray-500 group-hover:text-gray-700">
+                  View more details
+                </p>
+              </div>
+            </div>
+          </a>
+        </div>
+      </td>
+      <td className="border-t border-gray-200 px-3 py-3.5 text-sm text-gray-500">
+        {collection.editionSize}
+      </td>
+      <td className="border-t border-gray-200 px-3 py-3.5 text-sm text-gray-500">
+        {
+          parseFloat((Math.random() * 2).toFixed(2)) // Converts the string back to a floating-point number
+        }
+      </td>
+      <td className="border-t border-gray-200 px-3 py-3.5 text-sm text-gray-500">
+        {collection.vault.positiveVotes}
+      </td>
+      <td className="border-t border-gray-200 px-3 py-3.5 text-smtext-gray-500">
+        <button
+          type="button"
+          disabled={worldCoinData === null}
+          onClick={() => {
+            mint();
+          }}
+          className="disabled:opacity-50 inline-flex items-center rounded-md bg-white px-5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+        >
+          Mint
+        </button>
+      </td>
+    </tr>
+  );
+}
+
+function AttestCollection({ collection, collectionIdx, worldCoinData }: any) {
+  const { address } = useAccount();
+  const { write: attest } = useContractWrite({
+    address: collection.vault.id,
+    abi: VAULT_CONTRACT_ABI,
+    functionName: "vote",
+  });
+
+  return (
+    <tr key={collectionIdx}>
+      <td className="border-t border-gray-200 px-3 py-3.5 text-smtext-gray-500">
+        <div className="font-medium text-gray-900">
+          <a
+            href={`collections/${collection.editionAddress}`}
+            className="group block flex-shrink-0"
+          >
+            <div className="flex items-center">
+              <div>
+                <Image
+                  className="inline-block h-9 w-9 rounded-full"
+                  src="/nftree.jpg"
+                  height={64}
+                  width={64}
+                  alt=""
+                />
+              </div>
+              <div className="ml-3">
+                <p className="text-sm font-medium text-gray-700 group-hover:text-gray-900">
+                  NFTree
+                </p>
+                <p className="text-xs font-medium text-gray-500 group-hover:text-gray-700">
+                  {collection.editionAddress}
+                </p>
+              </div>
+            </div>
+          </a>
+        </div>
+      </td>
+      <td className="border-t border-gray-200 px-3 py-3.5 text-sm text-gray-500">
+        {collection.tokenId}
+      </td>
+
+      <td className="border-t border-gray-200 px-3 py-3.5 text-smtext-gray-500">
+        <button
+          disabled={worldCoinData === null}
+          onClick={() => {
+            attest({
+              args: [
+                collection.tokenId,
+                "Very Good Collection!",
+                true,
+                address,
+                worldCoinData.merkle_root,
+                worldCoinData.nullifier_hash,
+                convertProofToUINT(worldCoinData.proof),
+              ],
+              to: address,
+            });
+          }}
+          className="disabled:opacity-50 inline-flex items-center rounded-md bg-white px-5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+        >
+          Attest
+        </button>
+      </td>
+    </tr>
+  );
+}
+
 export default function ProjectAttestations() {
   const [open, setOpen] = useState(false);
   const [worldCoinData, setWorldCoinData] = useState<any>(null);
   const [loadingProjects, setLoadingProjects] = useState(true);
   const [allProjects, setAllProjects] = useState([]);
   const [projectsByOwner, setProjectsByOwner] = useState([]);
-  const [mintAddress, setMintAddress] = useState("0x");
+  const [attestingVaultAddress, setAttestingVaultAddress] = useState(null);
+  const [attestingTokenId, setAttestingTokenId] = useState(null);
 
-  const getFormatted = (data) => {
+  const getFormatted = (data: any) => {
     // Change projectsByOwner to this type
     // [{
     //   address: "PLACEHOLDER",
@@ -89,31 +234,6 @@ export default function ProjectAttestations() {
     // }]
   };
 
-  const {
-    data,
-    error: prepareError,
-    isError: isPrepareError,
-    isLoading,
-    isSuccess,
-    write,
-  } = useContractWrite({
-    address: ATESTAMINT_CONTRACT_ADDRESS,
-    abi: ATESTAMINT_ABI,
-    functionName: "createEditionCollection",
-  });
-
-  // const {data} =useContractReads({
-  //   contracts:
-  // })
-
-  const { write: mint } = useContractWrite({
-    address: mintAddress,
-    abi: ERC721DROP_ABI,
-    functionName: "purchase",
-    args: [1],
-    value: parseEther("0.000877"),
-  });
-
   const { address, isConnecting, isDisconnected } = useAccount();
 
   enum CredentialType {
@@ -134,15 +254,6 @@ export default function ProjectAttestations() {
     console.log("Unpacked Proof:", unpackedProof);
   };
 
-  const handleAttest = () => {
-    // let args = [[]];
-    // console.log("Formatted: ", args);
-    // write({
-    //   args,
-    //   from: address,
-    // });
-  };
-
   useEffect(() => {
     if (sessionStorage.getItem("worldcoinData")) {
       let worldcoinData: any = sessionStorage.getItem("worldcoinData");
@@ -159,14 +270,6 @@ export default function ProjectAttestations() {
 
       setLoadingProjects(false);
     })();
-
-    // const proof =
-    //   "0x01194ee68e962d1fffb8041b9cf169d26ae09e4b2463790fdda0089f4264c75824ab60b79f7c19205102eb9546c8640dfd3a2c638bcd0de1dca1b08af5813e040b63c250ac71ef56a428778c5c8bb17d4dbc5ed6a913198eb1755e7befde6158172489dba466a133ebfda90cc301fd6b7bfe0018e14360a80f125f8a3e7e3ae81c96590ee3a4d16bb85c05feb6569ae6ce4cda9d309cfd288b12ef7f4326ffbe0363704e1e4506a26a7f49aad1710b5b18c07ba4631af885490f7f58a967e974284d957b17d8ba6da10b80d71d462688f6e8ccd5b874c3cbbdcf0d6278ab7a9505589f0fb603e47ddcada1dafd54c0f2fc3a8a745e3f6db9415580438dcb339c";
-    // const unpackedProof = decodeAbiParameters(
-    //   [{ type: "uint256[8]" }],
-    //   proof
-    // )[0];
-    // console.log("Unpacked Proof:", unpackedProof);
   }, []);
 
   return (
@@ -265,49 +368,12 @@ export default function ProjectAttestations() {
             </thead>
             <tbody>
               {projectsByOwner.map((collection: any, collectionIdx) => (
-                <tr key={collectionIdx}>
-                  <td className="border-t border-gray-200 px-3 py-3.5 text-smtext-gray-500">
-                    <div className="font-medium text-gray-900">
-                      <a
-                        href={`collections/${collection.editionAddress}`}
-                        className="group block flex-shrink-0"
-                      >
-                        <div className="flex items-center">
-                          <div>
-                            <Image
-                              className="inline-block h-9 w-9 rounded-full"
-                              src="/nftree.jpg"
-                              height={64}
-                              width={64}
-                              alt=""
-                            />
-                          </div>
-                          <div className="ml-3">
-                            <p className="text-sm font-medium text-gray-700 group-hover:text-gray-900">
-                              NFTree
-                            </p>
-                            <p className="text-xs font-medium text-gray-500 group-hover:text-gray-700">
-                              {collection.editionAddress}
-                            </p>
-                          </div>
-                        </div>
-                      </a>
-                    </div>
-                  </td>
-                  <td className="border-t border-gray-200 px-3 py-3.5 text-sm text-gray-500">
-                    {collection.tokenId}
-                  </td>
-
-                  <td className="border-t border-gray-200 px-3 py-3.5 text-smtext-gray-500">
-                    <button
-                      disabled={worldCoinData === null}
-                      onClick={() => setOpen(true)}
-                      className="disabled:opacity-50 inline-flex items-center rounded-md bg-white px-5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                    >
-                      Attest
-                    </button>
-                  </td>
-                </tr>
+                <AttestCollection
+                  collection={collection}
+                  collectionIdx={collectionIdx}
+                  key={collectionIdx}
+                  worldCoinData={worldCoinData}
+                />
               ))}
             </tbody>
           </table>
@@ -360,60 +426,12 @@ export default function ProjectAttestations() {
             </thead>
             <tbody>
               {allProjects.map((collection: any, collectionIdx) => (
-                <tr key={collectionIdx}>
-                  <td className="border-t border-gray-200 px-3 py-3.5 text-smtext-gray-500">
-                    <div className="font-medium text-gray-900">
-                      <a
-                        href={`collections/${collection.id}`}
-                        className="group block flex-shrink-0"
-                      >
-                        <div className="flex items-center">
-                          <div>
-                            <Image
-                              className="inline-block h-9 w-9 rounded-full"
-                              src="/nftree.jpg"
-                              height={64}
-                              width={64}
-                              alt=""
-                            />
-                          </div>
-                          <div className="ml-3">
-                            <p className="text-sm font-medium text-gray-700 group-hover:text-gray-900">
-                              {collection.id.slice(0, 10)}
-                            </p>
-                            <p className="text-xs font-medium text-gray-500 group-hover:text-gray-700">
-                              View more details
-                            </p>
-                          </div>
-                        </div>
-                      </a>
-                    </div>
-                  </td>
-                  <td className="border-t border-gray-200 px-3 py-3.5 text-sm text-gray-500">
-                    {collection.editionSize}
-                  </td>
-                  <td className="border-t border-gray-200 px-3 py-3.5 text-sm text-gray-500">
-                    {
-                      parseFloat((Math.random() * 2).toFixed(2)) // Converts the string back to a floating-point number
-                    }
-                  </td>
-                  <td className="border-t border-gray-200 px-3 py-3.5 text-sm text-gray-500">
-                    {collection.vault.positiveVotes}
-                  </td>
-                  <td className="border-t border-gray-200 px-3 py-3.5 text-smtext-gray-500">
-                    <button
-                      type="button"
-                      disabled={worldCoinData === null}
-                      onClick={() => {
-                        setMintAddress(collection.id);
-                        mint();
-                      }}
-                      className="disabled:opacity-50 inline-flex items-center rounded-md bg-white px-5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                    >
-                      Mint
-                    </button>
-                  </td>
-                </tr>
+                <PublicCollection
+                  collection={collection}
+                  key={collectionIdx}
+                  collectionIdx={collectionIdx}
+                  worldCoinData={worldCoinData}
+                />
               ))}
             </tbody>
           </table>
@@ -550,6 +568,18 @@ export default function ProjectAttestations() {
                       type="button"
                       className="inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 sm:ml-3 sm:w-auto"
                       onClick={() => {
+                        attest({
+                          args: [
+                            attestingTokenId,
+                            "Very Good Collection!",
+                            true,
+                            address,
+                            worldCoinData.merkle_root,
+                            worldCoinData.nullifier_hash,
+                            convertProofToUINT(worldCoinData.proof),
+                          ],
+                          to: address,
+                        });
                         setOpen(false);
                       }}
                     >
