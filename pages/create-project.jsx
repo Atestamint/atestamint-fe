@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Layout from "@/components/layout";
+import { InformationCircleIcon } from "@heroicons/react/20/solid";
+
 import Image from "next/image";
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import { FilePond, registerPlugin } from "react-filepond";
@@ -9,6 +11,7 @@ import FilePondPluginImagePreview from "filepond-plugin-image-preview";
 import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
 import { useContractWrite } from "wagmi";
 import { parseEther } from "viem";
+import { Success } from "@/components/alerts";
 
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { IDKitWidget } from "@worldcoin/idkit";
@@ -84,6 +87,7 @@ export default function CreateProject() {
 
   const handleWorldCoinSuccess = (data) => {
     console.log("WorldCoin Success:", data);
+    sessionStorage.setItem("worldcoinData", JSON.stringify(data));
     setWorldCoinData(data);
   };
 
@@ -140,6 +144,11 @@ export default function CreateProject() {
   useEffect(() => {
     if (files.length > 0) {
       handleImageUpload(files);
+    }
+
+    if (sessionStorage.getItem("worldcoinData")) {
+      let worldCoinData = sessionStorage.getItem("worldcoinData");
+      setWorldCoinData(JSON.parse(worldCoinData));
     }
   }, [files]);
 
@@ -357,9 +366,10 @@ export default function CreateProject() {
                   <div className="animate-spin rounded-full h-4 w-4 border-t-2 mr-2 border-white-500"></div>
                 </div>
               )}
-              Proceed
+              Save Milestones
             </button>
             <button
+              disabled={createEditionParams?.metadataContractURI == ""}
               onClick={() => {
                 // Scroll page by 50%
                 window.scrollBy({
@@ -368,7 +378,7 @@ export default function CreateProject() {
                   behavior: "smooth",
                 });
               }}
-              className="rounded-full bg-white px-4 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+              className="disabled:opacity-50 rounded-full bg-white px-4 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
             >
               Next Step
             </button>
@@ -637,13 +647,34 @@ export default function CreateProject() {
                   />
                 </div>
               </div>
+
+              <div className="mt-5">
+                {isSuccess && <Success tx={data?.hash || ""} />}
+                {isLoading && (
+                  <div className="rounded-md bg-blue-50 p-4">
+                    <div className="flex">
+                      <div className="flex-shrink-0">
+                        <InformationCircleIcon
+                          className="h-5 w-5 text-blue-400"
+                          aria-hidden="true"
+                        />
+                      </div>
+                      <div className="ml-3 flex-1 md:flex md:justify-between">
+                        <p className="text-sm text-blue-700">
+                          Pending Transaction
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
           <div className="mt-5 flex justify-end gap-x-3">
             <button
               onClick={handleCreateEdition}
-              className="rounded-full bg-white px-4 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+              className="rounded-full bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-gray-200 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 hover:text-black"
             >
               Finish
             </button>

@@ -3,7 +3,7 @@ import { Html, Head, Main, NextScript } from "next/document";
 export default function Document() {
   return (
     <Html lang="en">
-      <Head>
+      <Head title="Atestamint - A launchpad that ensures NFT funds are used responsibly">
         <meta
           name="description"
           content="A simple project starter to work with TypeScript, React, NextJS and Styled Components"

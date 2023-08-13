@@ -1,8 +1,9 @@
 import Image from "next/image";
 import { IDKitWidget } from "@worldcoin/idkit";
 import { useAccount } from "wagmi";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Layout from "@/components/layout";
+import getLeaderboard from "../utils/thegraph-queries/getLeaderboard";
 
 const collections = [
   {
@@ -42,6 +43,8 @@ const collections = [
 
 export default function ProjectAttestations() {
   const { address, isConnecting, isDisconnected } = useAccount();
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   enum CredentialType {
     Orb = "orb",
@@ -56,7 +59,14 @@ export default function ProjectAttestations() {
     console.log("WorldCoin Verify:", data);
   };
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    (async () => {
+      const leaderboard = await getLeaderboard();
+      console.log(leaderboard);
+      setLeaderboard(leaderboard);
+      setLoading(false);
+    })();
+  }, []);
 
   return (
     <Layout>
@@ -102,16 +112,19 @@ export default function ProjectAttestations() {
               </tr>
             </thead>
             <tbody>
-              {collections.map((collection, collectionIdx) => (
-                <tr key={collection.id}>
+              {leaderboard.map((collection: any, collectionIdx) => (
+                <tr key={collectionIdx}>
                   <td className="border-t border-gray-200 px-3 py-3.5 text-smtext-gray-500">
                     <div className="font-medium text-gray-900">
-                      <a href="#" className="group block flex-shrink-0">
+                      <a
+                        href={`/collections/${collection.nftAddress}`}
+                        className="group block flex-shrink-0"
+                      >
                         <div className="flex items-center">
                           <div>
                             <Image
                               className="inline-block h-9 w-9 rounded-full"
-                              src="/avatar.png"
+                              src="/nftree.jpg"
                               height={64}
                               width={64}
                               alt=""
@@ -119,10 +132,10 @@ export default function ProjectAttestations() {
                           </div>
                           <div className="ml-3">
                             <p className="text-sm font-medium text-gray-700 group-hover:text-gray-900">
-                              Richard Hendricks
+                              {collection.nftAddress}...
                             </p>
                             <p className="text-xs font-medium text-gray-500 group-hover:text-gray-700">
-                              View profile
+                              View collection
                             </p>
                           </div>
                         </div>
@@ -131,7 +144,11 @@ export default function ProjectAttestations() {
                   </td>
 
                   <td className="border-t border-gray-200 px-3 py-3.5 text-sm text-gray-500">
-                    <span>{collection.attestations}</span>
+                    <span>
+                      {(parseInt(collection.positiveVotes) /
+                        parseInt(collection.editionSize)) *
+                        100}
+                    </span>
                   </td>
                   <td className="border-t border-gray-200 px-3 py-3.5 text-smtext-gray-500">
                     <button

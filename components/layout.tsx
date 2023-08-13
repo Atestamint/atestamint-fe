@@ -22,12 +22,6 @@ const navigation = [
     current: false,
   },
   {
-    name: "Collection Dashboard",
-    href: "/collections/0xa6b8d1303278155fd109C51E26281e0A1c843594",
-    icon: FolderIcon,
-    current: false,
-  },
-  {
     name: "Atestamint Scores",
     href: "/atestamint-score",
     icon: CalendarIcon,

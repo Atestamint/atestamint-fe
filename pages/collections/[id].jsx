@@ -12,28 +12,31 @@ import {
 } from "@heroicons/react/24/outline";
 import { test_data } from "utils/data";
 
-const NFTTransactions = ({ data }) => {
-  console.log(data);
+const NFTTransactions = ({ transactions }) => {
+  console.log("Transactions Data: ", transactions);
   return (
     <div>
-      <p>Updated At: {data?.updated_at || Date.now}</p>
-      <p>Chain Name: {data?.chain_name || "Optimism"}</p>
+      <p>Updated At: {transactions.updated_at} </p>
       {/* ...other fields */}
-      {data.items?.map((item, index) => (
-        <div key={index} className="mt-6 p-4 border rounded-md">
-          <h2 className="text-lg font-semibold">
-            {item?.contract_name || "NFTrees"}
-          </h2>
+      {transactions.items?.map((item, index) => (
+        <div key={index} className="mt-4 p-4 border rounded-md ">
           {/* ...other contract fields */}
           {item.nft_transactions.map((transaction, tIndex) => (
-            <div key={tIndex} className="mt-4 p-2 border rounded-md">
+            <a
+              href={`https://goerli-optimism.etherscan.io/tx/${
+                transaction?.tx_hash ||
+                "0x28feae0630bfd3af0827a36760c0910a756c81f2a1a5e176d2d8cdc8e4cf432a"
+              }`}
+              key={tIndex}
+              className="mt-4 border rounded-md"
+            >
               <p>
                 Tx Hash:{" "}
                 {transaction?.tx_hash ||
                   "0x28feae0630bfd3af0827a36760c0910a756c81f2a1a5e176d2d8cdc8e4cf432a"}
               </p>
               {/* ...other transaction fields */}
-            </div>
+            </a>
           ))}
         </div>
       ))}
@@ -50,13 +53,14 @@ const CovalentSection = () => {
         let headers = new Headers();
         headers.set("Authorization", "Bearer ckey_864c015b971c4dc981b370d382c");
         const response = await fetch(
-          `https://api.covalenthq.com/v1/eth-mainnet/tokens/${"0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d"}/nft_transactions/${"8197"}/`,
+          `https://api.covalenthq.com/v1/eth-mainnet/tokens/${"0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d"}/nft_transactions/${"1"}/`,
           { method: "GET", headers: headers }
         );
         const data = await response.json();
-        setResponseData(data);
+        setResponseData(data.data);
       } catch (error) {
         console.error("Error fetching data:", error);
+        setResponseData(test_data);
       }
     };
 
@@ -64,10 +68,10 @@ const CovalentSection = () => {
   }, []);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="flex items-center justify-center bg-gray-100">
       <div className="max-w-md w-full">
         {responseData ? (
-          <NFTTransactions data={responseData || test_data} />
+          <NFTTransactions transactions={responseData} />
         ) : (
           <p>Loading...</p>
         )}
@@ -78,7 +82,8 @@ const CovalentSection = () => {
 
 export default function Landing() {
   const router = useRouter();
-
+  const [vaultBalance, setVaultBalance] = useState(0);
+  const [vaultBalanceLoading, setVaultBalanceLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [collection, setCollection] = useState(null);
   const [milestoneData, setMilestoneData] = useState(null);
@@ -99,6 +104,7 @@ export default function Landing() {
 
           console.log("Milestones:", milestoneData);
           setMilestoneData(milestoneData);
+
           setLoading(false);
         }
       }
@@ -169,7 +175,7 @@ export default function Landing() {
               <div>
                 <div className="flex items-center gap-x-3">
                   <Image
-                    src={collection.imageURI}
+                    src={"/nftree.jpg"}
                     height={1280}
                     width={1920}
                     alt="Collection Image"
@@ -197,28 +203,28 @@ export default function Landing() {
             </div>
             <div className="mt-8">
               <p className="text-gray-600 text-sm">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Similique veniam dignissimos distinctio eveniet animi a maxime
-                fugit possimus? At molestias facere animi laborum qui amet eaque
-                ea sit corporis impedit.
+                Our organization will plant 100 evergreen trees in Nanaimo,
+                British Columbia to help improve soil and water conservation,
+                store carbon, moderate local climate, and give life to the
+                world&apos;s wildlife.
               </p>
             </div>
 
             <div className="mt-8 flex items-center justify-between">
               <div className="font-medium text-lg text-gray-600">
-                Milestone 1:
+                Milestone: <br /> {milestoneData.milestoneTitle}
               </div>
               <div className="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
-                Deadline: 13th August, 2023
+                Deadline:{" "}
+                {new Date(milestoneData.milestoneDeadline).toDateString()}
               </div>
             </div>
 
             <div className="mt-5">
               <p className="text-gray-600 text-sm">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Similique veniam dignissimos distinctio eveniet animi a maxime
-                fugit possimus? At molestias facere animi laborum qui amet eaque
-                ea sit corporis impedit.
+                {milestoneData.milestoneDescription == "Test"
+                  ? "Our organization will plant 100 evergreen trees in Nanaimo, British Columbia to help improve soil and water conservation, store carbon, moderate local climate, and give life to the world's wildlife."
+                  : milestoneData.milestoneDescription}
               </p>
             </div>
 
@@ -250,10 +256,21 @@ export default function Landing() {
                     1.0 ETH
                   </div>
                   <div className="h-6 text-indigo-600 text-sm">
-                    22/100 Minted
+                    No. of Attestations {collection.vault.positiveVotes} | Total
+                    supply: {collection.vault.editionSize}
                   </div>
                 </div>
               </div>
+            </div>
+
+            {/* Claim Funds Button */}
+            <div className="mt-8">
+              <button
+                type="button"
+                className="flex items-center rounded-md bg-slate-900 px-5 py-3 text-sm font-semibold text-gray-100 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 hover:text-black"
+              >
+                Claim Funds
+              </button>
             </div>
           </div>
         </div>
