@@ -63,7 +63,6 @@ export default function ProjectAttestations() {
   const [loadingProjects, setLoadingProjects] = useState(true);
   const [allProjects, setAllProjects] = useState([]);
   const [projectsByOwner, setProjectsByOwner] = useState([]);
-  const [mintAddress, setMintAddress] = useState("0x");
 
   const getFormatted = (data) => {
     // Change projectsByOwner to this type
@@ -107,13 +106,25 @@ export default function ProjectAttestations() {
   // })
 
   const { write: mint } = useContractWrite({
-    address: mintAddress,
     abi: ERC721DROP_ABI,
     functionName: "purchase",
     args: [1],
     value: parseEther("0.000877"),
   });
-
+  const { write: attest } = useContractWrite({
+    address: vaultAdress,
+    abi: VAULT_CONTRACT_ABI,
+    functionName: "vote",
+    args: [
+      tokenId,
+      "Very Good Collection!",
+      true,
+      signal,
+      root,
+      nullifierHash,
+      proof,
+    ],
+  });
   const { address, isConnecting, isDisconnected } = useAccount();
 
   enum CredentialType {
@@ -405,8 +416,7 @@ export default function ProjectAttestations() {
                       type="button"
                       disabled={worldCoinData === null}
                       onClick={() => {
-                        setMintAddress(collection.id);
-                        mint();
+                        mint({ to: collection.id });
                       }}
                       className="disabled:opacity-50 inline-flex items-center rounded-md bg-white px-5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
                     >
