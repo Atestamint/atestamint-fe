@@ -2,7 +2,7 @@ const { request, gql } = require("graphql-request");
 
 async function getAllProjectsQuery() {
   const endpoint =
-    "https://api.studio.thegraph.com/query/51108/atestamint-testing/v0.0.7";
+    "https://api.studio.thegraph.com/query/51108/atestamint-testing/v0.0.10";
   const query = gql`
     query Projects {
       dropCollections {
@@ -10,7 +10,13 @@ async function getAllProjectsQuery() {
         dropAddress
         editionSize
         currentTokenId
-        vaultAddress
+        vault {
+          id
+          positiveVotes
+          nftAddress
+          isUnlocked
+          editionSize
+        }
         metadataContractURI
       }
       editionCollections {
@@ -18,7 +24,13 @@ async function getAllProjectsQuery() {
         editionAddress
         editionSize
         metadataContractURI
-        vaultAddress
+        vault {
+          id
+          positiveVotes
+          nftAddress
+          isUnlocked
+          editionSize
+        }
         currentTokenId
       }
     }

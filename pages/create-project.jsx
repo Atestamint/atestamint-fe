@@ -51,7 +51,8 @@ export default function CreateProject() {
     presaleMerkleRoot:
       "0x0000000000000000000000000000000000000000000000000000000000000000",
     description: "",
-    animationURI: "",
+    animationURI:
+      "https://ipfs.io/ipfs/bafkreieb5wgfpxshncubgm232x4duop7cwwi7wr23rmsdxbq2mcjbczmti",
     metadataContractURI: "",
   });
   const [files, setFiles] = useState([]);
@@ -152,7 +153,7 @@ export default function CreateProject() {
       <div className="md:flex md:items-center md:justify-between">
         <div className="min-w-0 flex-1">
           <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
-            Create Project: Step One
+            Create Project
           </h2>
         </div>
         <div className="mt-4 flex md:ml-4 md:mt-0">
@@ -387,6 +388,19 @@ export default function CreateProject() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-5 lg:gap-y-0 lg:gap-x-5">
             {/* Image upload column */}
             <div>
+              <div className="mb-5">
+                <label className="block text-sm font-medium leading-6 text-gray-900">
+                  Image URI
+                </label>
+                <div className="mt-2">
+                  <input
+                    type="text"
+                    placeholder="Upload image or set custom Image URI"
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    value={createEditionParams.imageURI}
+                  />
+                </div>
+              </div>
               <FilePond
                 files={files}
                 onupdatefiles={setFiles}
@@ -475,7 +489,7 @@ export default function CreateProject() {
                     name="editionSize"
                     id="editionSize"
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    placeholder="24"
+                    placeholder="2"
                   />
                 </div>
               </div>
@@ -499,7 +513,7 @@ export default function CreateProject() {
                     name="royaltyBPS"
                     id="royaltyBPS"
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    placeholder="UGDF"
+                    placeholder="100"
                   />
                 </div>
               </div>
@@ -520,32 +534,13 @@ export default function CreateProject() {
                       });
                     }}
                     rows={4}
-                    name="comment"
-                    id="comment"
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                     defaultValue={""}
                     placeholder="Our organization will plant 100 evergreen trees in Nanaimo, British Columbia to help improve soil and water conservation, store carbon, moderate local climate, and give life to the world's wildlife."
                   />
                 </div>
               </div>
-              <div className="mt-5">
-                <label
-                  htmlFor="royaltyBPS"
-                  className="block text-sm font-medium leading-6 text-gray-900"
-                >
-                  Image URI
-                </label>
-                <div className="mt-2">
-                  <input
-                    disabled={true}
-                    type="text"
-                    name="royaltyBPS"
-                    id="royaltyBPS"
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    value={createEditionParams.imageURI}
-                  />
-                </div>
-              </div>
+
               <div className="mt-5">
                 <label
                   htmlFor="royaltyBPS"
@@ -562,10 +557,8 @@ export default function CreateProject() {
                       });
                     }}
                     type="text"
-                    name="royaltyBPS"
-                    id="royaltyBPS"
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    placeholder="UGDF"
+                    placeholder="https://ipfs.io/ipfs/bafkreieb5wgfpxshncubgm232x4duop7cwwi7wr23rmsdxbq2mcjbczmti"
                   />
                 </div>
               </div>

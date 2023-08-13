@@ -15,7 +15,7 @@ import {
 const collections = [
   {
     id: 1,
-    pfp: "/mutant-ape.png",
+    pfp: "/nftree.jpg",
     name: "",
     verified_on: "",
     supply: "100",
@@ -201,7 +201,7 @@ export default function ProjectAttestations() {
                           <div>
                             <Image
                               className="inline-block h-9 w-9 rounded-full"
-                              src="/avatar.png"
+                              src="/nftree.jpg"
                               height={64}
                               width={64}
                               alt=""
@@ -209,7 +209,7 @@ export default function ProjectAttestations() {
                           </div>
                           <div className="ml-3">
                             <p className="text-sm font-medium text-gray-700 group-hover:text-gray-900">
-                              Richard Hendricks
+                              NFTree
                             </p>
                             <p className="text-xs font-medium text-gray-500 group-hover:text-gray-700">
                               View profile
@@ -282,18 +282,6 @@ export default function ProjectAttestations() {
                 </th>
                 <th
                   scope="col"
-                  className="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 lg:table-cell"
-                >
-                  Milestones
-                </th>
-                <th
-                  scope="col"
-                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                >
-                  Date
-                </th>
-                <th
-                  scope="col"
                   className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                 >
                   Attestations
@@ -316,7 +304,7 @@ export default function ProjectAttestations() {
                           <div>
                             <Image
                               className="inline-block h-9 w-9 rounded-full"
-                              src="/nftree.png"
+                              src="/nftree.jpg"
                               height={64}
                               width={64}
                               alt=""
@@ -338,16 +326,10 @@ export default function ProjectAttestations() {
                     {collection.editionSize}
                   </td>
                   <td className="border-t border-gray-200 px-3 py-3.5 text-sm text-gray-500">
-                    {collection.vaultAddress.slice(0, 8)}
+                    {collection.vault.positiveVotes}
                   </td>
                   <td className="border-t border-gray-200 px-3 py-3.5 text-sm text-gray-500">
-                    {1}
-                  </td>
-                  <td className="border-t border-gray-200 px-3 py-3.5 text-sm text-gray-500">
-                    <span>{collection.date}</span>
-                  </td>
-                  <td className="border-t border-gray-200 px-3 py-3.5 text-sm text-gray-500">
-                    <span>{collection.attestations}</span>
+                    {collection.vault.positiveVotes}
                   </td>
                   <td className="border-t border-gray-200 px-3 py-3.5 text-smtext-gray-500">
                     <button
