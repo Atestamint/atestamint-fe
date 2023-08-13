@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Layout from "@/components/layout";
 import Image from "next/image";
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
@@ -12,6 +12,8 @@ import {
   useContractWrite,
   useWaitForTransaction,
 } from "wagmi";
+import { parseEther } from "viem";
+
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { IDKitWidget } from "@worldcoin/idkit";
 import { useAccount } from "wagmi";
@@ -40,13 +42,14 @@ export default function CreateProject() {
     symbol: "",
     editionSize: 0,
     royaltyBPS: 0,
-    publicSalePrice: 0.00001,
-    maxSalePurchasePerAddress: 0,
+    publicSalePrice: 0.0008,
+    maxSalePurchasePerAddress: 1,
     publicSaleStart: 0,
     publicSaleEnd: 0,
     presaleStart: 0,
     presaleEnd: 0,
-    presaleMerkleRoot: "",
+    presaleMerkleRoot:
+      "0x0000000000000000000000000000000000000000000000000000000000000000",
     description: "",
     animationURI: "",
     metadataContractURI: "",
@@ -67,10 +70,6 @@ export default function CreateProject() {
   });
 
   const handleImageUpload = (files) => {
-    setFiles(files);
-
-    console.log("Files: ", files);
-
     const file = files[0].file;
 
     storage_client
@@ -86,6 +85,7 @@ export default function CreateProject() {
         console.log("Error from NftStorage:", err);
       });
   };
+
   const handleWorldCoinSuccess = (data) => {
     console.log("WorldCoin Success:", data);
     setWorldCoinData(data);
@@ -113,34 +113,39 @@ export default function CreateProject() {
     console.log("Unformatted: ", createEditionParams);
 
     let args = [
-      createEditionParams.name,
-      createEditionParams.symbol,
-      parseInt(createEditionParams.editionSize),
-      parseInt(createEditionParams.royaltyBPS),
       [
-        parseInt(createEditionParams.publicSalePrice),
-        parseInt(createEditionParams.maxSalePurchasePerAddress),
-        parseInt(createEditionParams.publicSaleStart),
-        parseInt(createEditionParams.publicSaleEnd),
-        parseInt(createEditionParams.presaleStart),
-        parseInt(createEditionParams.presaleEnd),
-        createEditionParams.presaleMerkleRoot,
+        createEditionParams.name,
+        createEditionParams.symbol,
+        parseInt(createEditionParams.editionSize),
+        parseInt(createEditionParams.royaltyBPS),
+        [
+          parseEther(createEditionParams.publicSalePrice.toString()),
+          parseInt(createEditionParams.maxSalePurchasePerAddress),
+          parseInt(createEditionParams.publicSaleStart),
+          parseInt(createEditionParams.publicSaleEnd),
+          parseInt(createEditionParams.presaleStart),
+          parseInt(createEditionParams.presaleEnd),
+          createEditionParams.presaleMerkleRoot,
+        ],
+        createEditionParams.description,
+        createEditionParams.animationURI,
+        createEditionParams.imageURI,
+        createEditionParams.metadataContractURI,
       ],
-      createEditionParams.description,
-      createEditionParams.animationURI,
-      createEditionParams.imageURI,
-      createEditionParams.metadataContractURI,
     ];
     console.log("Formatted: ", args);
 
     write({
       args,
       from: address,
-      // value: parseEther("0.01"),
     });
   };
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    if (files.length > 0) {
+      handleImageUpload(files);
+    }
+  }, [files]);
 
   return (
     <Layout>
@@ -198,15 +203,10 @@ export default function CreateProject() {
             </label>
             <div className="mt-2">
               <input
-                type="email"
-                name="email"
-                id="email"
-                defaultValue={
-                  JSON.stringify(worldCoinData?.proof) || "Not verified yet."
-                }
+                type="text"
+                value={worldCoinData?.proof || "Not verified yet."}
                 disabled
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500 disabled:ring-gray-200 sm:text-sm sm:leading-6"
-                placeholder="you@example.com"
               />
             </div>
           </div>
@@ -424,10 +424,9 @@ export default function CreateProject() {
                         ...createEditionParams,
                         name: e.target.value,
                       });
+                      console.log(createEditionParams.name);
                     }}
                     type="text"
-                    name="nftName"
-                    id="nftName"
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                     placeholder="Colossal Shitcake"
                   />
@@ -448,12 +447,11 @@ export default function CreateProject() {
                         ...createEditionParams,
                         symbol: e.target.value,
                       });
+                      console.log(createEditionParams.symbol);
                     }}
                     type="text"
-                    name="symbol"
-                    id="symbol"
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    placeholder="CS"
+                    placeholder="RFIY"
                   />
                 </div>
               </div>
@@ -582,30 +580,41 @@ export default function CreateProject() {
                 <div className="mt-2">
                   <input
                     onChange={(e) => {
+                      let mintStartDate =
+                        new Date(e.target.value).getTime() / 1000;
                       setCreateEditionParams({
                         ...createEditionParams,
-                        publicSaleStart: e.target.value,
+                        publicSaleStart: mintStartDate,
                       });
                     }}
                     type="date"
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    value={Date().now}
+                    defaultValue={Date().now}
                   />
                 </div>
               </div>
 
               <div className="mt-5">
                 <label className="block text-sm font-medium leading-6 text-gray-900">
-                  Mint Duration
+                  Mint Duration in Days
                 </label>
                 <div className="mt-2">
                   <input
                     onChange={(e) => {
+                      // Add number of days to the publicSaleStart
+                      console.log(createEditionParams.publicSaleStart);
+                      let mintStartDate = new Date(
+                        createEditionParams.publicSaleStart * 1000
+                      );
+                      let mintEndDate = new Date(
+                        mintStartDate.setDate(
+                          mintStartDate.getDate() + parseInt(e.target.value)
+                        )
+                      );
+                      console.log(mintEndDate);
                       setCreateEditionParams({
                         ...createEditionParams,
-                        publicSaleEnd:
-                          createEditionParams.saleConfig.presaleStart +
-                          e.target.value,
+                        publicSaleEnd: mintEndDate.getTime() / 1000,
                       });
                     }}
                     type="number"

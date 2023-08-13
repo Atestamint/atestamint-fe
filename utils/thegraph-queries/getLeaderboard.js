@@ -2,7 +2,7 @@ const { request, gql } = require("graphql-request");
 
 async function getLeaderboardQuery() {
   const endpoint =
-    "https://api.studio.thegraph.com/query/51108/atestamint-testing/v0.0.2";
+    "https://api.studio.thegraph.com/query/51108/atestamint-testing/v0.0.7";
   const query = gql`
     query Leaderboard {
       vaults(orderBy: positiveVotes, orderDirection: desc) {
@@ -24,7 +24,7 @@ async function getLeaderboardQuery() {
 }
 
 export default async function getLeaderboard() {
-  getLeaderboardQuery()
+  return getLeaderboardQuery()
     .then((leaderboard) => {
       return leaderboard;
     })

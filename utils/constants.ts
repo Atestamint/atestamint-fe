@@ -1,6 +1,6 @@
 const VAULT_CONTRACT_ADDRESS = "0xBfCda0baC2A7866D0a13DB211Fe6532F0fA2Cad4";
 const ATESTAMINT_CONTRACT_ADDRESS =
-  "0xFdEdFc08cfa325fC2479dAf28Ae7e3A326EEC20C";
+  "0x0AE7d655Cda406c5b73Ea76855e2cE6aC3812a8E";
 
 const VAULT_CONTRACT_ABI = [
   {
@@ -403,6 +403,12 @@ const ATESTAMINT_ABI = [
       {
         indexed: false,
         internalType: "string",
+        name: "metadataURIBase",
+        type: "string",
+      },
+      {
+        indexed: false,
+        internalType: "string",
         name: "metadataContractURI",
         type: "string",
       },
@@ -440,6 +446,12 @@ const ATESTAMINT_ABI = [
       {
         indexed: false,
         internalType: "string",
+        name: "imageURI",
+        type: "string",
+      },
+      {
+        indexed: false,
+        internalType: "string",
         name: "metadataContractURI",
         type: "string",
       },
@@ -452,18 +464,6 @@ const ATESTAMINT_ABI = [
     name: "SETUP_VAULT_METHOD_ID",
     outputs: [{ internalType: "bytes4", name: "", type: "bytes4" }],
     stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      { internalType: "address", name: "implementation", type: "address" },
-      { internalType: "uint256", name: "salt", type: "uint256" },
-    ],
-    name: "_deployProxy",
-    outputs: [
-      { internalType: "address", name: "_contractAddress", type: "address" },
-    ],
-    stateMutability: "nonpayable",
     type: "function",
   },
   {

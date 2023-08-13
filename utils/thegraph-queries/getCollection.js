@@ -2,7 +2,7 @@ const { request, gql } = require("graphql-request");
 
 async function getCollectionQuery(collectionAddress) {
   const endpoint =
-    "https://api.studio.thegraph.com/query/51108/atestamint-testing/v0.0.2";
+    "https://api.studio.thegraph.com/query/51108/atestamint-testing/v0.0.7";
   const query = gql`
     query CollectionDetails($id: ID!) {
       dropCollection(id: $id) {
@@ -36,7 +36,7 @@ async function getCollectionQuery(collectionAddress) {
 }
 
 export default async function getCollection(collectionAddress) {
-  getCollectionQuery(collectionAddress)
+  return getCollectionQuery(collectionAddress)
     .then((collection) => {
       return collection;
     })

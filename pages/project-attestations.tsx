@@ -1,11 +1,11 @@
 import Image from "next/image";
 import { IDKitWidget } from "@worldcoin/idkit";
 import { useAccount } from "wagmi";
-import { useEffect } from "react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { decodeAbiParameters } from "viem";
+import getAllProjects from "../utils/thegraph-queries/getAllProjects";
 
-import { Fragment, useState } from "react";
+import { Fragment, useState, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import {
   ExclamationTriangleIcon,
@@ -50,6 +50,8 @@ const collections = [
 
 export default function ProjectAttestations() {
   const [open, setOpen] = useState(false);
+  const [loadingProjects, setLoadingProjects] = useState(true);
+  const [allProjects, setAllProjects] = useState([]);
 
   const { address, isConnecting, isDisconnected } = useAccount();
 
@@ -60,6 +62,13 @@ export default function ProjectAttestations() {
 
   const handleWorldCoinSuccess = (data: any) => {
     console.log("WorldCoin Success:", data);
+    const proof =
+      "0x01194ee68e962d1fffb8041b9cf169d26ae09e4b2463790fdda0089f4264c75824ab60b79f7c19205102eb9546c8640dfd3a2c638bcd0de1dca1b08af5813e040b63c250ac71ef56a428778c5c8bb17d4dbc5ed6a913198eb1755e7befde6158172489dba466a133ebfda90cc301fd6b7bfe0018e14360a80f125f8a3e7e3ae81c96590ee3a4d16bb85c05feb6569ae6ce4cda9d309cfd288b12ef7f4326ffbe0363704e1e4506a26a7f49aad1710b5b18c07ba4631af885490f7f58a967e974284d957b17d8ba6da10b80d71d462688f6e8ccd5b874c3cbbdcf0d6278ab7a9505589f0fb603e47ddcada1dafd54c0f2fc3a8a745e3f6db9415580438dcb339c";
+    const unpackedProof = decodeAbiParameters(
+      [{ type: "uint256[8]" }],
+      proof
+    )[0];
+    console.log("Unpacked Proof:", unpackedProof);
   };
 
   const handleVerify = (data: any) => {
@@ -67,6 +76,12 @@ export default function ProjectAttestations() {
   };
 
   useEffect(() => {
+    (async () => {
+      const projects: any = await getAllProjects();
+      console.log("Projects:", projects);
+      setAllProjects(projects);
+      setLoadingProjects(false);
+    })();
     // const proof =
     //   "0x01194ee68e962d1fffb8041b9cf169d26ae09e4b2463790fdda0089f4264c75824ab60b79f7c19205102eb9546c8640dfd3a2c638bcd0de1dca1b08af5813e040b63c250ac71ef56a428778c5c8bb17d4dbc5ed6a913198eb1755e7befde6158172489dba466a133ebfda90cc301fd6b7bfe0018e14360a80f125f8a3e7e3ae81c96590ee3a4d16bb85c05feb6569ae6ce4cda9d309cfd288b12ef7f4326ffbe0363704e1e4506a26a7f49aad1710b5b18c07ba4631af885490f7f58a967e974284d957b17d8ba6da10b80d71d462688f6e8ccd5b874c3cbbdcf0d6278ab7a9505589f0fb603e47ddcada1dafd54c0f2fc3a8a745e3f6db9415580438dcb339c";
     // const unpackedProof = decodeAbiParameters(
@@ -292,8 +307,8 @@ export default function ProjectAttestations() {
               </tr>
             </thead>
             <tbody>
-              {collections.map((collection, collectionIdx) => (
-                <tr key={collection.id}>
+              {allProjects.map((collection: any, collectionIdx) => (
+                <tr key={collectionIdx}>
                   <td className="border-t border-gray-200 px-3 py-3.5 text-smtext-gray-500">
                     <div className="font-medium text-gray-900">
                       <a href="#" className="group block flex-shrink-0">
@@ -301,7 +316,7 @@ export default function ProjectAttestations() {
                           <div>
                             <Image
                               className="inline-block h-9 w-9 rounded-full"
-                              src="/avatar.png"
+                              src="/nftree.png"
                               height={64}
                               width={64}
                               alt=""
@@ -312,7 +327,7 @@ export default function ProjectAttestations() {
                               Richard Hendricks
                             </p>
                             <p className="text-xs font-medium text-gray-500 group-hover:text-gray-700">
-                              View profile
+                              {collection.editionAddress.slice(0, 10)}
                             </p>
                           </div>
                         </div>
@@ -320,13 +335,13 @@ export default function ProjectAttestations() {
                     </div>
                   </td>
                   <td className="border-t border-gray-200 px-3 py-3.5 text-sm text-gray-500">
-                    {collection.supply}
+                    {collection.editionSize}
                   </td>
                   <td className="border-t border-gray-200 px-3 py-3.5 text-sm text-gray-500">
-                    {collection.funds_locked}
+                    {collection.vaultAddress.slice(0, 8)}
                   </td>
                   <td className="border-t border-gray-200 px-3 py-3.5 text-sm text-gray-500">
-                    {collection.milestones}
+                    {1}
                   </td>
                   <td className="border-t border-gray-200 px-3 py-3.5 text-sm text-gray-500">
                     <span>{collection.date}</span>

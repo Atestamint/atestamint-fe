@@ -2,7 +2,7 @@ const { request, gql } = require("graphql-request");
 
 async function getAllProjectsByCreatorQuery(creatorAddress) {
   const endpoint =
-    "https://api.studio.thegraph.com/query/51108/atestamint-testing/v0.0.2";
+    "https://api.studio.thegraph.com/query/51108/atestamint-testing/v0.0.7";
   const query = gql`
     query ProjectsByCreator($creator: Bytes!) {
       dropCollections(where: { creator: $creator }) {
@@ -35,7 +35,7 @@ async function getAllProjectsByCreatorQuery(creatorAddress) {
 }
 
 export default async function getAllProjectsByCreator(creatorAddress) {
-  getAllProjectsByCreatorQuery(creatorAddress)
+  return getAllProjectsByCreatorQuery(creatorAddress)
     .then((projects) => {
       return projects;
     })
