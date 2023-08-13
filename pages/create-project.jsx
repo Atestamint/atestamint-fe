@@ -84,6 +84,7 @@ export default function CreateProject() {
 
   const handleWorldCoinSuccess = (data) => {
     console.log("WorldCoin Success:", data);
+    sessionStorage.setItem("worldcoinData", JSON.stringify(data));
     setWorldCoinData(data);
   };
 
@@ -140,6 +141,11 @@ export default function CreateProject() {
   useEffect(() => {
     if (files.length > 0) {
       handleImageUpload(files);
+    }
+
+    if (sessionStorage.getItem("worldcoinData")) {
+      let worldCoinData = sessionStorage.getItem("worldcoinData");
+      setWorldCoinData(JSON.parse(worldCoinData));
     }
   }, [files]);
 

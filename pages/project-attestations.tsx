@@ -85,8 +85,10 @@ export default function ProjectAttestations() {
 
   const handleWorldCoinSuccess = (data: any) => {
     console.log("WorldCoin Success:", data);
+    sessionStorage.setItem("worldcoinData", JSON.stringify(data));
 
     setWorldCoinData(data);
+
     const proof =
       "0x01194ee68e962d1fffb8041b9cf169d26ae09e4b2463790fdda0089f4264c75824ab60b79f7c19205102eb9546c8640dfd3a2c638bcd0de1dca1b08af5813e040b63c250ac71ef56a428778c5c8bb17d4dbc5ed6a913198eb1755e7befde6158172489dba466a133ebfda90cc301fd6b7bfe0018e14360a80f125f8a3e7e3ae81c96590ee3a4d16bb85c05feb6569ae6ce4cda9d309cfd288b12ef7f4326ffbe0363704e1e4506a26a7f49aad1710b5b18c07ba4631af885490f7f58a967e974284d957b17d8ba6da10b80d71d462688f6e8ccd5b874c3cbbdcf0d6278ab7a9505589f0fb603e47ddcada1dafd54c0f2fc3a8a745e3f6db9415580438dcb339c";
     const unpackedProof = decodeAbiParameters(
@@ -106,6 +108,10 @@ export default function ProjectAttestations() {
   };
 
   useEffect(() => {
+    if (sessionStorage.getItem("worldcoinData")) {
+      let worldcoinData: any = sessionStorage.getItem("worldcoinData");
+      setWorldCoinData(JSON.parse(worldcoinData));
+    }
     (async () => {
       const allProjects: any = await getAllProjects();
       console.log("Projects:", allProjects);

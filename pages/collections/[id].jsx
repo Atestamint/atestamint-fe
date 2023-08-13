@@ -12,28 +12,31 @@ import {
 } from "@heroicons/react/24/outline";
 import { test_data } from "utils/data";
 
-const NFTTransactions = ({ data }) => {
-  console.log(data);
+const NFTTransactions = ({ transactions }) => {
+  console.log("Transactions Data: ", transactions);
   return (
     <div>
-      <p>Updated At: {data?.updated_at || Date.now}</p>
-      <p>Chain Name: {data?.chain_name || "Optimism"}</p>
+      <p>Updated At: {transactions.updated_at} </p>
       {/* ...other fields */}
-      {data.items?.map((item, index) => (
-        <div key={index} className="mt-6 p-4 border rounded-md">
-          <h2 className="text-lg font-semibold">
-            {item?.contract_name || "NFTrees"}
-          </h2>
+      {transactions.items?.map((item, index) => (
+        <div key={index} className="mt-4 p-4 border rounded-md ">
           {/* ...other contract fields */}
           {item.nft_transactions.map((transaction, tIndex) => (
-            <div key={tIndex} className="mt-4 p-2 border rounded-md">
+            <a
+              href={`https://goerli-optimism.etherscan.io/tx/${
+                transaction?.tx_hash ||
+                "0x28feae0630bfd3af0827a36760c0910a756c81f2a1a5e176d2d8cdc8e4cf432a"
+              }`}
+              key={tIndex}
+              className="mt-4 border rounded-md"
+            >
               <p>
                 Tx Hash:{" "}
                 {transaction?.tx_hash ||
                   "0x28feae0630bfd3af0827a36760c0910a756c81f2a1a5e176d2d8cdc8e4cf432a"}
               </p>
               {/* ...other transaction fields */}
-            </div>
+            </a>
           ))}
         </div>
       ))}
@@ -50,13 +53,14 @@ const CovalentSection = () => {
         let headers = new Headers();
         headers.set("Authorization", "Bearer ckey_864c015b971c4dc981b370d382c");
         const response = await fetch(
-          `https://api.covalenthq.com/v1/eth-mainnet/tokens/${"0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d"}/nft_transactions/${"8197"}/`,
+          `https://api.covalenthq.com/v1/eth-mainnet/tokens/${"0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d"}/nft_transactions/${"1"}/`,
           { method: "GET", headers: headers }
         );
         const data = await response.json();
-        setResponseData(data);
+        setResponseData(data.data);
       } catch (error) {
         console.error("Error fetching data:", error);
+        setResponseData(test_data);
       }
     };
 
@@ -64,10 +68,10 @@ const CovalentSection = () => {
   }, []);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="flex items-center justify-center bg-gray-100">
       <div className="max-w-md w-full">
         {responseData ? (
-          <NFTTransactions data={responseData || test_data} />
+          <NFTTransactions transactions={responseData} />
         ) : (
           <p>Loading...</p>
         )}
@@ -206,10 +210,11 @@ export default function Landing() {
 
             <div className="mt-8 flex items-center justify-between">
               <div className="font-medium text-lg text-gray-600">
-                Milestone 1:
+                Milestone: <br /> {milestoneData.milestoneTitle}
               </div>
               <div className="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
-                Deadline: 13th August, 2023
+                Deadline:{" "}
+                {new Date(milestoneData.milestoneDeadline).toDateString()}
               </div>
             </div>
 
