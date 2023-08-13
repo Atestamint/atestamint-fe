@@ -2,12 +2,10 @@ const { request, gql } = require("graphql-request");
 
 async function getAllProjectsQuery() {
   const endpoint =
-    "https://api.studio.thegraph.com/query/51108/atestamint-testing/v0.0.10";
+    "https://api.studio.thegraph.com/query/51108/atestamint-testing/v1.0.0";
   const query = gql`
     query Projects {
       dropCollections {
-        creator
-        dropAddress
         editionSize
         currentTokenId
         vault {
@@ -21,7 +19,6 @@ async function getAllProjectsQuery() {
       }
       editionCollections {
         creator
-        editionAddress
         editionSize
         metadataContractURI
         vault {
@@ -32,6 +29,8 @@ async function getAllProjectsQuery() {
           editionSize
         }
         currentTokenId
+        imageURI
+        id
       }
     }
   `;
