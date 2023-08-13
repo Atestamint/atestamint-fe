@@ -6,7 +6,7 @@ import { decodeAbiParameters } from "viem";
 import getAllProjects from "../utils/thegraph-queries/getAllProjects";
 import getAllProjectsByOwner from "../utils/thegraph-queries/getAllProjectsByOwner";
 import { Fragment, useState, useEffect } from "react";
-import { useContractWrite } from "wagmi";
+import { useContractWrite, useSignMessage } from "wagmi";
 import { parseEther } from "viem";
 import {
   ATESTAMINT_CONTRACT_ADDRESS,
@@ -213,6 +213,101 @@ function AttestCollection({
   );
 }
 
+function AttestCollectionClone({
+  collection,
+  collectionIdx,
+  worldCoinData,
+  allProjects,
+}: any) {
+  const { address } = useAccount();
+  let vaultAddress = allProjects.find(
+    (project: any) => project.id === collection.editionAddress
+  )?.vault.id;
+
+  const {
+    data,
+    error: prepareError,
+    isError: isPrepareError,
+    isLoading,
+    isSuccess,
+    write: attest,
+  } = useContractWrite({
+    address: ATESTAMINT_CONTRACT_ADDRESS,
+    abi: ATESTAMINT_ABI,
+    functionName: "createEditionCollection",
+  });
+
+  return (
+    <tr key={collectionIdx}>
+      <td className="border-t border-gray-200 px-3 py-3.5 text-smtext-gray-500">
+        <div className="font-medium text-gray-900">
+          <a
+            href={`collections/${collection.editionAddress}`}
+            className="group block flex-shrink-0"
+          >
+            <div className="flex items-center">
+              <div>
+                <Image
+                  className="inline-block h-9 w-9 rounded-full"
+                  src="/nftree.jpg"
+                  height={64}
+                  width={64}
+                  alt=""
+                />
+              </div>
+              <div className="ml-3">
+                <p className="text-sm font-medium text-gray-700 group-hover:text-gray-900">
+                  NFTree
+                </p>
+                <p className="text-xs font-medium text-gray-500 group-hover:text-gray-700">
+                  {collection.editionAddress}
+                </p>
+              </div>
+            </div>
+          </a>
+        </div>
+      </td>
+      <td className="border-t border-gray-200 px-3 py-3.5 text-sm text-gray-500">
+        {collection.tokenId}
+      </td>
+
+      <td className="border-t border-gray-200 px-3 py-3.5 text-smtext-gray-500">
+        <button
+          disabled={worldCoinData === null}
+          onClick={() => {
+            attest({
+              args: [
+                [
+                  "Dummy",
+                  "UMA",
+                  parseInt("2"),
+                  parseInt("100"),
+                  [
+                    parseEther((0.0008).toString()),
+                    1,
+                    1691943947,
+                    1691954947,
+                    0,
+                    0,
+                    "0x0000000000000000000000000000000000000000000000000000000000000000",
+                  ],
+                  "DUMMY",
+                  "DUMMY",
+                  "DUMMy",
+                  "DUMMY",
+                ],
+              ],
+            });
+          }}
+          className="disabled:opacity-50 inline-flex items-center rounded-md bg-white px-5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+        >
+          Attest
+        </button>
+      </td>
+    </tr>
+  );
+}
+
 export default function ProjectAttestations() {
   const [open, setOpen] = useState(false);
   const [worldCoinData, setWorldCoinData] = useState<any>(null);
@@ -378,7 +473,7 @@ export default function ProjectAttestations() {
             </thead>
             <tbody>
               {projectsByOwner.map((collection: any, collectionIdx) => (
-                <AttestCollection
+                <AttestCollectionClone
                   allProjects={allProjects}
                   collection={collection}
                   collectionIdx={collectionIdx}
