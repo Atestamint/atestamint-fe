@@ -82,7 +82,8 @@ const CovalentSection = () => {
 
 export default function Landing() {
   const router = useRouter();
-
+  const [vaultBalance, setVaultBalance] = useState(0);
+  const [vaultBalanceLoading, setVaultBalanceLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [collection, setCollection] = useState(null);
   const [milestoneData, setMilestoneData] = useState(null);
@@ -103,6 +104,7 @@ export default function Landing() {
 
           console.log("Milestones:", milestoneData);
           setMilestoneData(milestoneData);
+
           setLoading(false);
         }
       }
@@ -173,7 +175,7 @@ export default function Landing() {
               <div>
                 <div className="flex items-center gap-x-3">
                   <Image
-                    src={collection.imageURI}
+                    src={"/nftree.jpg"}
                     height={1280}
                     width={1920}
                     alt="Collection Image"
@@ -201,10 +203,10 @@ export default function Landing() {
             </div>
             <div className="mt-8">
               <p className="text-gray-600 text-sm">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Similique veniam dignissimos distinctio eveniet animi a maxime
-                fugit possimus? At molestias facere animi laborum qui amet eaque
-                ea sit corporis impedit.
+                Our organization will plant 100 evergreen trees in Nanaimo,
+                British Columbia to help improve soil and water conservation,
+                store carbon, moderate local climate, and give life to the
+                world's wildlife.
               </p>
             </div>
 
@@ -220,10 +222,9 @@ export default function Landing() {
 
             <div className="mt-5">
               <p className="text-gray-600 text-sm">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Similique veniam dignissimos distinctio eveniet animi a maxime
-                fugit possimus? At molestias facere animi laborum qui amet eaque
-                ea sit corporis impedit.
+                {milestoneData.milestoneDescription == "Test"
+                  ? "Our organization will plant 100 evergreen trees in Nanaimo, British Columbia to help improve soil and water conservation, store carbon, moderate local climate, and give life to the world's wildlife."
+                  : milestoneData.milestoneDescription}
               </p>
             </div>
 
@@ -255,10 +256,21 @@ export default function Landing() {
                     1.0 ETH
                   </div>
                   <div className="h-6 text-indigo-600 text-sm">
-                    22/100 Minted
+                    No. of Attestations {collection.vault.positiveVotes} | Total
+                    supply: {collection.vault.editionSize}
                   </div>
                 </div>
               </div>
+            </div>
+
+            {/* Claim Funds Button */}
+            <div className="mt-8">
+              <button
+                type="button"
+                className="flex items-center rounded-md bg-slate-900 px-5 py-3 text-sm font-semibold text-gray-100 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 hover:text-black"
+              >
+                Claim Funds
+              </button>
             </div>
           </div>
         </div>
