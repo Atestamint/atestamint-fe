@@ -2,7 +2,7 @@ const { request, gql } = require("graphql-request");
 
 async function getLeaderboardQuery() {
   const endpoint =
-    "https://api.studio.thegraph.com/query/51108/atestamint-testing/v0.0.7";
+    "https://api.studio.thegraph.com/query/51108/atestamint-testing/v1.0.0";
   const query = gql`
     query Leaderboard {
       vaults(orderBy: positiveVotes, orderDirection: desc) {
@@ -16,7 +16,7 @@ async function getLeaderboardQuery() {
   try {
     const data = await request(endpoint, query, {});
     console.log("Data:", data);
-    return data.accounts;
+    return data.vaults;
   } catch (error) {
     console.error("Error fetching data:", error);
     return [];
