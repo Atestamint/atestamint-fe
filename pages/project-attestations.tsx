@@ -11,6 +11,7 @@ import { parseEther } from "viem";
 import {
   ATESTAMINT_CONTRACT_ADDRESS,
   ATESTAMINT_ABI,
+  ERC721DROP_ABI,
 } from "../utils/constants";
 
 import { Dialog, Transition } from "@headlessui/react";
@@ -62,6 +63,7 @@ export default function ProjectAttestations() {
   const [loadingProjects, setLoadingProjects] = useState(true);
   const [allProjects, setAllProjects] = useState([]);
   const [projectsByOwner, setProjectsByOwner] = useState([]);
+  const [mintAddress, setMintAddress] = useState("0x");
 
   const {
     data,
@@ -74,6 +76,14 @@ export default function ProjectAttestations() {
     address: ATESTAMINT_CONTRACT_ADDRESS,
     abi: ATESTAMINT_ABI,
     functionName: "createEditionCollection",
+  });
+
+  const { write: mint } = useContractWrite({
+    address: mintAddress,
+    abi: ERC721DROP_ABI,
+    functionName: "purchase",
+    args: [1],
+    value: parseEther("0.000877"),
   });
 
   const { address, isConnecting, isDisconnected } = useAccount();
@@ -361,6 +371,10 @@ export default function ProjectAttestations() {
                     <button
                       type="button"
                       disabled={worldCoinData === null}
+                      onClick={() => {
+                        setMintAddress(collection.id);
+                        mint();
+                      }}
                       className="disabled:opacity-50 inline-flex items-center rounded-md bg-white px-5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
                     >
                       Mint
