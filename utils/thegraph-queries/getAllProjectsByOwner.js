@@ -2,7 +2,7 @@ const { request, gql } = require("graphql-request");
 
 async function getAllProjectsByOwnerQuery(ownerAddress) {
   const endpoint =
-    "https://api.studio.thegraph.com/query/51108/atestamint-testing/v1.0.0";
+    "https://api.studio.thegraph.com/query/51108/atestamint/v4.0.0";
   const query = gql`
     query ProjectsByOwner($owner: Bytes!) {
       dropNFTs(where: { owner: $owner }) {

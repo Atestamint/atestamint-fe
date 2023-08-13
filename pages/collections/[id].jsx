@@ -6,7 +6,7 @@ import { Fragment, useState, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { useRouter } from "next/router";
 import { VAULT_CONTRACT_ABI } from "../../utils/constants";
-
+import { useContractWrite } from "wagmi";
 import {
   ExclamationTriangleIcon,
   XMarkIcon,
