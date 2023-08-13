@@ -4,13 +4,21 @@ import { useAccount } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { decodeAbiParameters } from "viem";
 import getAllProjects from "../utils/thegraph-queries/getAllProjects";
-
+import getAllProjectsByOwner from "../utils/thegraph-queries/getAllProjectsByOwner";
 import { Fragment, useState, useEffect } from "react";
+import { useContractWrite } from "wagmi";
+import { parseEther } from "viem";
+import {
+  ATESTAMINT_CONTRACT_ADDRESS,
+  ATESTAMINT_ABI,
+} from "../utils/constants";
+
 import { Dialog, Transition } from "@headlessui/react";
 import {
   ExclamationTriangleIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
+import { all } from "axios";
 
 const collections = [
   {
@@ -52,6 +60,20 @@ export default function ProjectAttestations() {
   const [open, setOpen] = useState(false);
   const [loadingProjects, setLoadingProjects] = useState(true);
   const [allProjects, setAllProjects] = useState([]);
+  const [projectsByOwner, setProjectsByOwner] = useState([]);
+
+  const {
+    data,
+    error: prepareError,
+    isError: isPrepareError,
+    isLoading,
+    isSuccess,
+    write,
+  } = useContractWrite({
+    address: ATESTAMINT_CONTRACT_ADDRESS,
+    abi: ATESTAMINT_ABI,
+    functionName: "createEditionCollection",
+  });
 
   const { address, isConnecting, isDisconnected } = useAccount();
 
@@ -71,15 +93,25 @@ export default function ProjectAttestations() {
     console.log("Unpacked Proof:", unpackedProof);
   };
 
-  const handleVerify = (data: any) => {
-    console.log("WorldCoin Verify:", data);
+  const handleAttest = () => {
+    // let args = [[]];
+    // console.log("Formatted: ", args);
+    // write({
+    //   args,
+    //   from: address,
+    // });
   };
 
   useEffect(() => {
     (async () => {
-      const projects: any = await getAllProjects();
-      console.log("Projects:", projects);
-      setAllProjects(projects);
+      const allProjects: any = await getAllProjects();
+      console.log("Projects:", allProjects);
+      setAllProjects(allProjects);
+
+      const projectsByOwner: any = await getAllProjectsByOwner(address);
+      console.log("Projects By Owner:", projectsByOwner);
+      setProjectsByOwner(projectsByOwner);
+
       setLoadingProjects(false);
     })();
     // const proof =
@@ -118,7 +150,6 @@ export default function ProjectAttestations() {
               action="atestamint" // this is your action name from the Developer Portal
               signal={address}
               onSuccess={handleWorldCoinSuccess} // callback when the modal is closed
-              handleVerify={handleVerify} // optional callback when the proof is received
               credential_types={[CredentialType.Orb, CredentialType.Phone]} // optional, defaults to ['orb']
               enableTelemetry // optional, defaults to false
             >
@@ -157,32 +188,9 @@ export default function ProjectAttestations() {
                   scope="col"
                   className="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 lg:table-cell"
                 >
-                  Supply
+                  TokenId
                 </th>
-                <th
-                  scope="col"
-                  className="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 lg:table-cell"
-                >
-                  Funds Locked
-                </th>
-                <th
-                  scope="col"
-                  className="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 lg:table-cell"
-                >
-                  Milestones
-                </th>
-                <th
-                  scope="col"
-                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                >
-                  Date
-                </th>
-                <th
-                  scope="col"
-                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                >
-                  Attestations
-                </th>
+
                 <th
                   scope="col"
                   className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
@@ -192,8 +200,8 @@ export default function ProjectAttestations() {
               </tr>
             </thead>
             <tbody>
-              {collections.map((collection, collectionIdx) => (
-                <tr key={collection.id}>
+              {projectsByOwner.map((collection: any, collectionIdx) => (
+                <tr key={collectionIdx}>
                   <td className="border-t border-gray-200 px-3 py-3.5 text-smtext-gray-500">
                     <div className="font-medium text-gray-900">
                       <a href="#" className="group block flex-shrink-0">
@@ -212,7 +220,7 @@ export default function ProjectAttestations() {
                               NFTree
                             </p>
                             <p className="text-xs font-medium text-gray-500 group-hover:text-gray-700">
-                              View profile
+                              {collection.editionAddress}
                             </p>
                           </div>
                         </div>
@@ -220,20 +228,9 @@ export default function ProjectAttestations() {
                     </div>
                   </td>
                   <td className="border-t border-gray-200 px-3 py-3.5 text-sm text-gray-500">
-                    {collection.supply}
+                    {collection.tokenId}
                   </td>
-                  <td className="border-t border-gray-200 px-3 py-3.5 text-sm text-gray-500">
-                    {collection.funds_locked}
-                  </td>
-                  <td className="border-t border-gray-200 px-3 py-3.5 text-sm text-gray-500">
-                    {collection.milestones}
-                  </td>
-                  <td className="border-t border-gray-200 px-3 py-3.5 text-sm text-gray-500">
-                    <span>{collection.date}</span>
-                  </td>
-                  <td className="border-t border-gray-200 px-3 py-3.5 text-sm text-gray-500">
-                    <span>{collection.attestations}</span>
-                  </td>
+
                   <td className="border-t border-gray-200 px-3 py-3.5 text-smtext-gray-500">
                     <button
                       type="button"
@@ -326,7 +323,9 @@ export default function ProjectAttestations() {
                     {collection.editionSize}
                   </td>
                   <td className="border-t border-gray-200 px-3 py-3.5 text-sm text-gray-500">
-                    {collection.vault.positiveVotes}
+                    {
+                      parseFloat((Math.random() * 2).toFixed(2)) // Converts the string back to a floating-point number
+                    }
                   </td>
                   <td className="border-t border-gray-200 px-3 py-3.5 text-sm text-gray-500">
                     {collection.vault.positiveVotes}

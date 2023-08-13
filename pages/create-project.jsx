@@ -7,18 +7,13 @@ import "filepond/dist/filepond.min.css";
 import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
 import FilePondPluginImagePreview from "filepond-plugin-image-preview";
 import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
-import {
-  usePrepareContractWrite,
-  useContractWrite,
-  useWaitForTransaction,
-} from "wagmi";
+import { useContractWrite } from "wagmi";
 import { parseEther } from "viem";
 
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { IDKitWidget } from "@worldcoin/idkit";
 import { useAccount } from "wagmi";
 import { ATESTAMINT_CONTRACT_ADDRESS, ATESTAMINT_ABI } from "utils/constants";
-import { useDebounce } from "hooks/useDebounce";
 import { NFTStorage, File, Blob } from "nft.storage";
 
 // Register the plugins
