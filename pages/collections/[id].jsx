@@ -206,7 +206,7 @@ export default function Landing() {
                 Our organization will plant 100 evergreen trees in Nanaimo,
                 British Columbia to help improve soil and water conservation,
                 store carbon, moderate local climate, and give life to the
-                world's wildlife.
+                world&apos;s wildlife.
               </p>
             </div>
 
