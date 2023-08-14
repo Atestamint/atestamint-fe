@@ -22,7 +22,7 @@ https://www.canva.com/design/DAFrawuTrgI/vqz76zXaUkPm1y7hIPPaDA/view?utm_content
 1. AtestamintV2 - https://goerli-optimism.etherscan.io/address/0x0AE7d655Cda406c5b73Ea76855e2cE6aC3812a8E#code
 2. Vault Implementation - https://goerli-optimism.etherscan.io/address/0xc4f783d1f0be2e52b59e5d1dd6888ee26c8fe27c#code
 3. EAS Schema - https://optimism-goerli-bedrock.easscan.org/schema/view/0xae694f9e713ed68fabb42e4d75e15282c1db63887a06df4a78ca3c91a444fc14
-4. Atestamint Subgraph API Endpoint - https://api.studio.thegraph.com/query/51108/atestamint-testing/v3.0.0
+4. Atestamint Subgraph API Endpoint - https://api.studio.thegraph.com/query/51108/atestamint-testing/v2.0.0
 
 
 ### Optimism
